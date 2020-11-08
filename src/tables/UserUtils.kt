@@ -1,6 +1,6 @@
 package com.twoilya.lonelyboardgamer.tables
 
-import com.twoilya.lonelyboardgamer.auth.User
+import com.twoilya.lonelyboardgamer.auth.AuthenticationException
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -9,22 +9,20 @@ import org.joda.time.DateTime
 import java.util.*
 
 object UserUtils {
-    fun isExist(userId: String) = findUserCredentials(userId) != null
+    fun isExist(userId: String) = getUserCredentials(userId) != null
 
     fun isUserLoggedIn(userId: String, iat: Date): Boolean {
-        val user = findUserCredentials(userId)
-        require(user?.id != null && user.last_logout != null) {"Not enough information in JWT token"}
-        println("${DateTime(iat)} ${user?.last_logout}")
-        return !(user == null || user.last_logout.isAfter(DateTime(iat)))
+        val user = getUserCredentials(userId)
+        return !(user == null || user.lastLogout.isAfter(DateTime(iat)))
     }
 
-    private fun findUserCredentials(userId: String): User? {
+    fun getUserCredentials(userId: String): Credentials? {
         val users = transaction {
-            UserLoginInfo.select { UserLoginInfo.id eq userId }.limit(1)
+            UsersLoginInfo.select { UsersLoginInfo.id eq userId }.limit(1)
                 .map {
-                    User(
-                        id = it[UserLoginInfo.id],
-                        last_logout = it[UserLoginInfo.lastLogout]
+                    Credentials(
+                        id = it[UsersLoginInfo.id],
+                        lastLogout = it[UsersLoginInfo.lastLogout]
                     )
                 }
         }
@@ -35,16 +33,16 @@ object UserUtils {
         }
     }
 
-    fun getUserProfileInfo(userId: String): User? {
+    fun getUserProfileInfo(userId: String): ProfileInfo? {
         val users = transaction {
-            UserProfileInfo.select { UserProfileInfo.id eq userId }
+            UsersProfileInfo.select { UsersProfileInfo.id eq userId }
                 .limit(1)
                 .map {
-                    User(
-                        id = it[UserProfileInfo.id],
-                        first_name = it[UserProfileInfo.firstName],
-                        last_name = it[UserProfileInfo.secondName],
-                        address = it[UserProfileInfo.address]
+                    ProfileInfo(
+                        id = it[UsersProfileInfo.id],
+                        firstName = it[UsersProfileInfo.firstName],
+                        secondName = it[UsersProfileInfo.secondName],
+                        address = it[UsersProfileInfo.address]
                     )
                 }
         }
@@ -55,32 +53,25 @@ object UserUtils {
         }
     }
 
-    fun addUser(user: User) {
-        require(
-            user.address != null
-                    && user.id != null
-                    && user.first_name != null
-                    && user.last_name != null
-        ) { "Not all information provided" }
-
+    fun addUser(userId: String, userFirstName: String, userSecondName: String, userAddress: String) {
         transaction {
-            UserLoginInfo.insert {
-                it[id] = user.id
+            UsersLoginInfo.insert {
+                it[id] = userId
                 it[lastLogout] = DateTime(System.currentTimeMillis()).secondOfDay().roundFloorCopy()
             }
-            UserProfileInfo.insert {
-                it[id] = user.id
-                it[address] = user.address
-                it[firstName] = user.first_name
-                it[secondName] = user.last_name
+            UsersProfileInfo.insert {
+                it[id] = userId
+                it[address] = userAddress
+                it[firstName] = userFirstName
+                it[secondName] = userSecondName
             }
         }
     }
 
     fun logOut(userId: String) {
         transaction {
-            UserLoginInfo.update({UserLoginInfo.id eq userId}) {
-                it[UserLoginInfo.lastLogout] = DateTime(System.currentTimeMillis())
+            UsersLoginInfo.update({UsersLoginInfo.id eq userId}) {
+                it[UsersLoginInfo.lastLogout] = DateTime(System.currentTimeMillis())
             }
         }
     }

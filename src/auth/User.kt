@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import io.ktor.auth.Principal
 import org.joda.time.DateTime
 
+/*
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class User(
     val id: String? = null,
@@ -13,3 +14,4 @@ data class User(
     val VKAccessToken: String? = null,
     val last_logout: DateTime? = null
 ) : Principal
+*/

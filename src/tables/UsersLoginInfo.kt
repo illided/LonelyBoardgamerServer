@@ -7,10 +7,13 @@ import org.jetbrains.exposed.sql.jodatime.datetime
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
+import java.util.*
 
-object UserLoginInfo : Table() {
+object UsersLoginInfo : Table() {
     val id: Column<String> = varchar("id", 10)
     val lastLogout: Column<DateTime> = datetime("lastLogout")
 
     override val primaryKey = PrimaryKey(id)
 }
+
+data class Credentials(val id: String, val lastLogout: DateTime)

@@ -54,9 +54,8 @@ fun Application.module(testing: Boolean = false) {
                 validate { jwtCredential ->
                     val id = jwtCredential.payload.claims["id"]?.asString() ?: return@validate null
                     val iat = jwtCredential.payload.claims["iat"]?.asDate() ?: return@validate null
-                   /* println("Claims: $id , $iat")*/
                     if (UserUtils.isUserLoggedIn(id, iat)) {
-                        User(id = id)
+                        Ticket(id)
                     } else {
                         null
                     }
@@ -75,13 +74,13 @@ fun Application.module(testing: Boolean = false) {
                 }
 
                 get("/profile") {
-                    val user = call.principal<User>()?.id?.let { UserUtils.getUserProfileInfo(it) }
+                    val user = call.principal<Ticket>()?.id?.let { UserUtils.getUserProfileInfo(it) }
                         ?: throw AuthenticationException("Such user does not exist")
                     call.respond(user)
                 }
 
                 post("/logout") {
-                    call.principal<User>()?.id?.let { UserUtils.logOut(it) }
+                    call.principal<Ticket>()?.id?.let { UserUtils.logOut(it) }
                         ?: throw AuthenticationException("Such user does not exist")
                     call.respond(ServerResponse(1, "Logged out"))
                 }
