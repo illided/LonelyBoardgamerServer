@@ -66,7 +66,7 @@ object UserUtils {
         transaction {
             UserLoginInfo.insert {
                 it[id] = user.id
-                it[lastLogout] = DateTime(System.currentTimeMillis())
+                it[lastLogout] = DateTime(System.currentTimeMillis()).secondOfDay().roundFloorCopy()
             }
             UserProfileInfo.insert {
                 it[id] = user.id

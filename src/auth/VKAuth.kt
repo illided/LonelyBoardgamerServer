@@ -1,7 +1,6 @@
 package com.twoilya.lonelyboardgamer.auth
 
 import com.fasterxml.jackson.databind.JsonMappingException
-import com.twoilya.lonelyboardgamer.auth.AuthorizationException
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.client.HttpClient
 import io.ktor.client.features.json.JacksonSerializer
@@ -41,7 +40,6 @@ object VKAuth {
     }
 
     suspend fun getName(userId: String): Pair<String, String> {
-        println("$USERS_GET?user_ids=$userId&$IN_RUSSIAN&$SERVER_TOKEN&$VK_API_VERSION")
         val response = connectAndGet<UsersGetResponse>(
             url = "$USERS_GET?user_ids=$userId&$IN_RUSSIAN&$SERVER_TOKEN&$VK_API_VERSION",
             exception = AuthorizationException("Server token is invalid or such id does not exist")
