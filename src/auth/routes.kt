@@ -1,9 +1,10 @@
 package com.twoilya.lonelyboardgamer.auth
 
 import com.twoilya.lonelyboardgamer.ServerResponse
+import com.twoilya.lonelyboardgamer.vk.VKConnector
 import com.twoilya.lonelyboardgamer.tables.UserUtils
 import io.ktor.application.call
-import io.ktor.request.receive
+import io.ktor.request.receiveParameters
 import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.post
@@ -11,16 +12,14 @@ import io.ktor.routing.post
 fun loginRoute(route: Routing) {
     route {
         post("/login") {
-            val user = call.receive<User>()
-            require(user.VKAccessToken != null) { "No token provided" }
-
-            val userId = VKAuth.checkToken(user.VKAccessToken)
+            val vkAccessToken =
+                call.receiveParameters()["VKAccessToken"] ?: throw IllegalArgumentException("No token provided")
+            val userId = VKConnector.checkToken(vkAccessToken)
             if (!UserUtils.isExist(userId)) {
                 throw AuthorizationException(
                     "This user does not exist"
                 )
             }
-
             call.respond(ServerResponse(1, JwtConfig.makeToken(userId)))
         }
     }
@@ -29,23 +28,24 @@ fun loginRoute(route: Routing) {
 fun registerRoute(route: Routing) {
     route {
         post("/register") {
-            val user = call.receive<User>()
-            require(user.VKAccessToken != null) { "No token provided" }
+            val parameters = call.receiveParameters()
 
-            val userId = VKAuth.checkToken(user.VKAccessToken)
+            val vkAccessToken = parameters["VKAccessToken"]
+            val address = parameters["address"]
+            require(vkAccessToken != null && address != null) { "No token provided" }
+
+            val userId = VKConnector.checkToken(vkAccessToken)
             if (UserUtils.isExist(userId)) {
                 throw AuthorizationException("This user already exist")
             }
 
-            val (firstName, secondName) = VKAuth.getName(userId)
+            val (firstName, lastName) = VKConnector.getName(userId)
 
             UserUtils.addUser(
-                User(
-                    first_name = firstName,
-                    last_name = secondName,
-                    id = userId,
-                    address = user.address
-                )
+                userFirstName = firstName,
+                userSecondName = lastName,
+                userId = userId,
+                userAddress = address
             )
             call.respond(ServerResponse(1, JwtConfig.makeToken(userId)))
         }
