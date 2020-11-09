@@ -11,7 +11,7 @@ object DatabaseConnector {
     fun init() {
         Database.connect(hikari())
         transaction {
-            create(UsersLoginInfo, UsersProfileInfo)
+            create(UsersLoginInfo, UsersProfileInfo, BGCategories, BGMechanics)
         }
     }
 

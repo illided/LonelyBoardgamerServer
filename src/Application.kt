@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.*
 import com.twoilya.lonelyboardgamer.auth.*
 import com.twoilya.lonelyboardgamer.tables.DatabaseConnector
 import com.twoilya.lonelyboardgamer.tables.UserUtils
+import com.twoilya.lonelyboardgamer.tables.UsersProfileInfo
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
@@ -69,21 +70,7 @@ fun Application.module(testing: Boolean = false) {
             registerRoute(this)
 
             authenticate {
-                get("/secret") {
-                    call.respond(ServerResponse(1, "Чокопай вкуснее, если его разогреть"))
-                }
-
-                get("/profile") {
-                    val user = call.principal<Ticket>()?.id?.let { UserUtils.getUserProfileInfo(it) }
-                        ?: throw AuthenticationException("Such user does not exist")
-                    call.respond(user)
-                }
-
-                post("/logout") {
-                    call.principal<Ticket>()?.id?.let { UserUtils.logOut(it) }
-                        ?: throw AuthenticationException("Such user does not exist")
-                    call.respond(ServerResponse(1, "Logged out"))
-                }
+                profileActions(this)
             }
         }
     }.start(wait = true)

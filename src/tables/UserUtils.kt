@@ -1,6 +1,7 @@
 package com.twoilya.lonelyboardgamer.tables
 
-import com.twoilya.lonelyboardgamer.auth.AuthenticationException
+import com.twoilya.lonelyboardgamer.vk.VKConnector
+import io.ktor.http.Parameters
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -33,27 +34,8 @@ object UserUtils {
         }
     }
 
-    fun getUserProfileInfo(userId: String): ProfileInfo? {
-        val users = transaction {
-            UsersProfileInfo.select { UsersProfileInfo.id eq userId }
-                .limit(1)
-                .map {
-                    ProfileInfo(
-                        id = it[UsersProfileInfo.id],
-                        firstName = it[UsersProfileInfo.firstName],
-                        secondName = it[UsersProfileInfo.secondName],
-                        address = it[UsersProfileInfo.address]
-                    )
-                }
-        }
-        return if (users.isEmpty()) {
-            null
-        } else {
-            users[0]
-        }
-    }
-
-    fun addUser(userId: String, userFirstName: String, userSecondName: String, userAddress: String) {
+    suspend fun addUser(userId: String, parameters: Parameters) {
+        val (vkFirstName, vkSecondName) = VKConnector.getName(userId)
         transaction {
             UsersLoginInfo.insert {
                 it[id] = userId
@@ -61,9 +43,12 @@ object UserUtils {
             }
             UsersProfileInfo.insert {
                 it[id] = userId
-                it[address] = userAddress
-                it[firstName] = userFirstName
-                it[secondName] = userSecondName
+                it[address] = parameters["address"] ?: throw IllegalArgumentException("No address provided")
+                it[description] = parameters["description"]
+                it[prefCategories] = parameters["prefCategories"]
+                it[prefMechanics] = parameters["prefMechanics"]
+                it[firstName] = vkFirstName
+                it[secondName] = vkSecondName
             }
         }
     }

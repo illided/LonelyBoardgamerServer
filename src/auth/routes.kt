@@ -16,9 +16,7 @@ fun loginRoute(route: Routing) {
                 call.receiveParameters()["VKAccessToken"] ?: throw IllegalArgumentException("No token provided")
             val userId = VKConnector.checkToken(vkAccessToken)
             if (!UserUtils.isExist(userId)) {
-                throw AuthorizationException(
-                    "This user does not exist"
-                )
+                throw AuthorizationException("This user does not exist")
             }
             call.respond(ServerResponse(1, JwtConfig.makeToken(userId)))
         }
@@ -29,24 +27,12 @@ fun registerRoute(route: Routing) {
     route {
         post("/register") {
             val parameters = call.receiveParameters()
-
-            val vkAccessToken = parameters["VKAccessToken"]
-            val address = parameters["address"]
-            require(vkAccessToken != null && address != null) { "No token provided" }
-
+            val vkAccessToken = parameters["VKAccessToken"] ?: throw IllegalArgumentException("No token provided")
             val userId = VKConnector.checkToken(vkAccessToken)
             if (UserUtils.isExist(userId)) {
                 throw AuthorizationException("This user already exist")
             }
-
-            val (firstName, lastName) = VKConnector.getName(userId)
-
-            UserUtils.addUser(
-                userFirstName = firstName,
-                userSecondName = lastName,
-                userId = userId,
-                userAddress = address
-            )
+            UserUtils.addUser(userId, parameters)
             call.respond(ServerResponse(1, JwtConfig.makeToken(userId)))
         }
     }
