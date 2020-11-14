@@ -39,7 +39,7 @@ object UsersProfileInfo : Table() {
 
                         address = row[address],
 
-                        description = row[description],
+                        description = row[description] ?: "",
 
                         prefCategories = BGCategories.findById(row[prefCategories]?.split(",")),
                         prefMechanics = BGMechanics.findById(row[prefMechanics]?.split(","))
@@ -60,7 +60,7 @@ data class ProfileInfo(
     val firstName: String,
     val secondName: String,
     val address: String,
-    val prefCategories: List<String>?,
-    val prefMechanics: List<String>?,
-    val description: String?
+    val prefCategories: List<String>,
+    val prefMechanics: List<String>,
+    val description: String
 )
