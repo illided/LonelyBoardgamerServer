@@ -43,19 +43,28 @@ object UserUtils {
             }
             UsersProfileInfo.insert {
                 it[id] = userId
-                it[address] = parameters["address"] ?: throw IllegalArgumentException("No address provided")
-                it[description] = parameters["description"]
-                it[prefCategories] = parameters["prefCategories"]
-                it[prefMechanics] = parameters["prefMechanics"]
+
                 it[firstName] = vkFirstName
                 it[secondName] = vkSecondName
+
+                it[address] = parameters["address"] ?: throw IllegalArgumentException("No address provided")
+
+                it[description] = parameters["description"]
+
+                it[prefCategories] = BGCategories.findByName(
+                    parameters["prefCategories"]?.split(",")
+                ).joinToString(",")
+
+                it[prefMechanics] = BGMechanics.findByName(
+                    parameters["prefMechanics"]?.split(",")
+                ).joinToString(",")
             }
         }
     }
 
     fun logOut(userId: String) {
         transaction {
-            UsersLoginInfo.update({UsersLoginInfo.id eq userId}) {
+            UsersLoginInfo.update({ UsersLoginInfo.id eq userId }) {
                 it[UsersLoginInfo.lastLogout] = DateTime(System.currentTimeMillis())
             }
         }

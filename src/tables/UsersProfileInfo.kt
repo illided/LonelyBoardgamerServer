@@ -41,10 +41,8 @@ object UsersProfileInfo : Table() {
 
                         description = row[description],
 
-                        prefCategories = BGCategories.find(
-                            row[prefCategories]?.split(",")?.map { it.toInt() }),
-                        prefMechanics = BGMechanics.find(
-                            row[prefMechanics]?.split(",")?.map { it.toInt() })
+                        prefCategories = BGCategories.findById(row[prefCategories]?.split(",")),
+                        prefMechanics = BGMechanics.findById(row[prefMechanics]?.split(","))
                     )
                 }
         }
