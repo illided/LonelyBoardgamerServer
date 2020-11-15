@@ -1,5 +1,6 @@
 package com.twoilya.lonelyboardgamer.tables
 
+import com.twoilya.lonelyboardgamer.InfoMissingException
 import com.twoilya.lonelyboardgamer.vk.VKConnector
 import io.ktor.http.Parameters
 import org.jetbrains.exposed.sql.insert
@@ -47,7 +48,7 @@ object UserUtils {
                 it[firstName] = vkFirstName
                 it[secondName] = vkSecondName
 
-                it[address] = parameters["address"] ?: throw IllegalArgumentException("No address provided")
+                it[address] = parameters["address"] ?: throw InfoMissingException("No address provided")
 
                 it[description] = parameters["description"]
 

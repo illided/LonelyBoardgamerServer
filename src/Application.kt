@@ -15,6 +15,7 @@ import io.ktor.auth.jwt.jwt
 import io.ktor.auth.principal
 import io.ktor.jackson.*
 import io.ktor.features.*
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 
@@ -39,12 +40,11 @@ fun Application.module(testing: Boolean = false) {
 
         install(StatusPages) {
             exception<Throwable> { cause ->
-                call.respond(
-                    ServerResponse(
-                        0,
-                        cause.message ?: "No message provided"
-                    )
-                )
+                if (cause is WithCodeException) {
+                    call.respond(ServerResponse(cause.code, cause.message ?: "No message provided"))
+                } else {
+                    call.respond(HttpStatusCode.InternalServerError, "Unexpected exception caught on server")
+                }
             }
         }
 

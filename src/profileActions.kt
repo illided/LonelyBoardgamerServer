@@ -1,6 +1,5 @@
 package com.twoilya.lonelyboardgamer
 
-import com.twoilya.lonelyboardgamer.auth.AuthenticationException
 import com.twoilya.lonelyboardgamer.tables.BGCategories
 import com.twoilya.lonelyboardgamer.tables.BGMechanics
 import com.twoilya.lonelyboardgamer.tables.UserUtils
@@ -20,7 +19,7 @@ fun profileActions(route: Route) {
                 val user = call.principal<Ticket>()?.id?.let {
                     UsersProfileInfo.find(it)
                 }
-                    ?: throw AuthenticationException("Such user does not exist")
+                    ?: throw ElementWasNotFoundException("Such user does not exist")
                 call.respond(user)
             }
 
@@ -28,13 +27,13 @@ fun profileActions(route: Route) {
                 call.principal<Ticket>()?.id?.let {
                     UserUtils.logOut(it)
                 }
-                    ?: throw AuthenticationException("Such user does not exist")
-                call.respond(ServerResponse(1, "Logged out"))
+                    ?: throw ElementWasNotFoundException("Such user does not exist")
+                call.respond(ServerResponse(0, "Logged out"))
             }
 
             route("/change") {
                 post("/description") {
-                    val new = call.receiveParameters()["new"] ?: throw IllegalArgumentException("No description provided")
+                    val new = call.receiveParameters()["new"] ?: throw InfoMissingException("No description provided")
                     call.principal<Ticket>()?.id?.let {
                         transaction {
                             UsersProfileInfo.update({ UsersProfileInfo.id eq it }) {
@@ -42,12 +41,12 @@ fun profileActions(route: Route) {
                             }
                         }
                     }
-                    call.respond(ServerResponse(1, "Description changed"))
+                    call.respond(ServerResponse(0, "Description changed"))
                 }
 
                 post("/prefCategories") {
                     val new = call.receiveParameters()["new"]
-                        ?.split(",") ?: throw IllegalArgumentException("No categories provided")
+                        ?.split(",") ?: throw InfoMissingException("No categories provided")
                     call.principal<Ticket>()?.id?.let {
                         transaction {
                             UsersProfileInfo.update({ UsersProfileInfo.id eq it }) {
@@ -55,12 +54,12 @@ fun profileActions(route: Route) {
                             }
                         }
                     }
-                    call.respond(ServerResponse(1, "Preferable categories changed"))
+                    call.respond(ServerResponse(0, "Preferable categories changed"))
                 }
 
                 post("/prefMechanics") {
                     val new = call.receiveParameters()["new"]
-                        ?.split(",") ?: throw IllegalArgumentException("No mechanics provided")
+                        ?.split(",") ?: throw InfoMissingException("No mechanics provided")
                     call.principal<Ticket>()?.id?.let {
                         transaction {
                             UsersProfileInfo.update({ UsersProfileInfo.id eq it }) {
@@ -68,11 +67,11 @@ fun profileActions(route: Route) {
                             }
                         }
                     }
-                    call.respond(ServerResponse(1, "Preferable mechanics changed"))
+                    call.respond(ServerResponse(0, "Preferable mechanics changed"))
                 }
 
                 post("/address") {
-                    val new = call.receiveParameters()["new"] ?: throw IllegalArgumentException("No address provided")
+                    val new = call.receiveParameters()["new"] ?: throw InfoMissingException("No address provided")
                     call.principal<Ticket>()?.id?.let {
                         transaction {
                             UsersProfileInfo.update({ UsersProfileInfo.id eq it }) {
@@ -80,7 +79,7 @@ fun profileActions(route: Route) {
                             }
                         }
                     }
-                    call.respond(ServerResponse(1, "Address changed"))
+                    call.respond(ServerResponse(0, "Address changed"))
                 }
             }
         }

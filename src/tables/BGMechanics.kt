@@ -1,5 +1,6 @@
 package com.twoilya.lonelyboardgamer.tables
 
+import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.select
@@ -27,6 +28,6 @@ object BGMechanics : Table() {
 
         return transaction {
             BGMechanics.select { name inList names }.map { it[BGMechanics.id] }
-        }.also { if (it.size != names.size) throw IllegalArgumentException("Not all mechanics were founded") }
+        }.also { if (it.size != names.size) throw ElementWasNotFoundException("Not all mechanics were founded") }
     }
 }

@@ -1,5 +1,8 @@
 package com.twoilya.lonelyboardgamer.auth
 
+import com.twoilya.lonelyboardgamer.AuthorizationException
+import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
+import com.twoilya.lonelyboardgamer.InfoMissingException
 import com.twoilya.lonelyboardgamer.ServerResponse
 import com.twoilya.lonelyboardgamer.vk.VKConnector
 import com.twoilya.lonelyboardgamer.tables.UserUtils
@@ -13,12 +16,12 @@ fun loginRoute(route: Routing) {
     route {
         post("/login") {
             val vkAccessToken =
-                call.receiveParameters()["VKAccessToken"] ?: throw IllegalArgumentException("No token provided")
+                call.receiveParameters()["VKAccessToken"] ?: throw InfoMissingException("No token provided")
             val userId = VKConnector.checkToken(vkAccessToken)
             if (!UserUtils.isExist(userId)) {
-                throw AuthorizationException("This user does not exist")
+                throw ElementWasNotFoundException("This user does not exist")
             }
-            call.respond(ServerResponse(1, JwtConfig.makeToken(userId)))
+            call.respond(ServerResponse(0, JwtConfig.makeToken(userId)))
         }
     }
 }
@@ -27,13 +30,13 @@ fun registerRoute(route: Routing) {
     route {
         post("/register") {
             val parameters = call.receiveParameters()
-            val vkAccessToken = parameters["VKAccessToken"] ?: throw IllegalArgumentException("No token provided")
+            val vkAccessToken = parameters["VKAccessToken"] ?: throw InfoMissingException("No token provided")
             val userId = VKConnector.checkToken(vkAccessToken)
             if (UserUtils.isExist(userId)) {
-                throw AuthorizationException("This user already exist")
+                throw ElementWasNotFoundException("This user already exist")
             }
             UserUtils.addUser(userId, parameters)
-            call.respond(ServerResponse(1, JwtConfig.makeToken(userId)))
+            call.respond(ServerResponse(0, JwtConfig.makeToken(userId)))
         }
     }
 }

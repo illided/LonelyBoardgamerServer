@@ -1,7 +1,7 @@
 package com.twoilya.lonelyboardgamer.vk
 
 import com.fasterxml.jackson.databind.JsonMappingException
-import com.twoilya.lonelyboardgamer.auth.AuthorizationException
+import com.twoilya.lonelyboardgamer.AuthorizationException
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.client.HttpClient
 import io.ktor.client.features.json.JacksonSerializer
@@ -48,10 +48,7 @@ object VKConnector {
             )
 
         require(response.response.size == 1) { "No user with such id" }
-
         val user = response.response.component1()
-        require(user.first_name != null && user.last_name != null) { "User have no name or second name" }
-
         return Pair(user.first_name, user.last_name)
     }
 }
