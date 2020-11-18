@@ -15,3 +15,7 @@ class InfoMissingException(message: String) : WithCodeException(message) {
 class ElementWasNotFoundException(message: String) : WithCodeException(message) {
     override val code: Int = 3
 }
+
+class WrongDataFormatException(message: String) : WithCodeException(message) {
+    override val code: Int = 4
+}

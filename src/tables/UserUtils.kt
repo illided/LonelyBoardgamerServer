@@ -1,7 +1,9 @@
 package com.twoilya.lonelyboardgamer.tables
 
 import com.twoilya.lonelyboardgamer.InfoMissingException
+import com.twoilya.lonelyboardgamer.geo.Geocoder
 import com.twoilya.lonelyboardgamer.vk.VKConnector
+import com.twoilya.lonelyboardgamer.tables.UserLocations
 import io.ktor.http.Parameters
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
@@ -36,7 +38,10 @@ object UserUtils {
     }
 
     suspend fun addUser(userId: String, parameters: Parameters) {
+        val userAddress = parameters["address"] ?: throw InfoMissingException("No address provided")
         val (vkFirstName, vkSecondName) = VKConnector.getName(userId)
+        val (lat, lng) = Geocoder.getCoordinates(userAddress)
+
         transaction {
             UsersLoginInfo.insert {
                 it[id] = userId
@@ -48,7 +53,7 @@ object UserUtils {
                 it[firstName] = vkFirstName
                 it[secondName] = vkSecondName
 
-                it[address] = parameters["address"] ?: throw InfoMissingException("No address provided")
+                it[address] = userAddress
 
                 it[description] = parameters["description"]
 
@@ -59,6 +64,12 @@ object UserUtils {
                 it[prefMechanics] = BGMechanics.findByName(
                     parameters["prefMechanics"]?.split(",")
                 ).joinToString(",")
+            }
+            UserLocations.insert {
+                it[id] = userId
+
+                it[latitude] = lat.toDouble()
+                it[longitude] = lng.toDouble()
             }
         }
     }

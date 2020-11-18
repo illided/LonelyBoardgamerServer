@@ -1,21 +1,24 @@
 package com.twoilya.lonelyboardgamer
 
-import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import com.fasterxml.jackson.databind.*
-import com.twoilya.lonelyboardgamer.auth.*
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.twoilya.lonelyboardgamer.auth.JwtConfig
+import com.twoilya.lonelyboardgamer.auth.loginRoute
+import com.twoilya.lonelyboardgamer.auth.registerRoute
 import com.twoilya.lonelyboardgamer.tables.DatabaseConnector
 import com.twoilya.lonelyboardgamer.tables.UserUtils
-import com.twoilya.lonelyboardgamer.tables.UsersProfileInfo
 import io.github.cdimascio.dotenv.dotenv
+import io.ktor.application.Application
+import io.ktor.application.call
+import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
 import io.ktor.auth.jwt.jwt
-import io.ktor.auth.principal
-import io.ktor.jackson.*
-import io.ktor.features.*
+import io.ktor.features.ContentNegotiation
+import io.ktor.features.StatusPages
 import io.ktor.http.HttpStatusCode
+import io.ktor.jackson.jackson
+import io.ktor.response.respond
+import io.ktor.routing.Routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 
@@ -44,6 +47,7 @@ fun Application.module(testing: Boolean = false) {
                     call.respond(ServerResponse(cause.code, cause.message ?: "No message provided"))
                 } else {
                     call.respond(HttpStatusCode.InternalServerError, "Unexpected exception caught on server")
+                    println("UNEXPECTED EXCEPTION: ${cause.message}")
                 }
             }
         }
@@ -66,9 +70,7 @@ fun Application.module(testing: Boolean = false) {
 
         install(Routing) {
             loginRoute(this)
-
             registerRoute(this)
-
             authenticate {
                 profileActions(this)
             }
