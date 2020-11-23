@@ -1,9 +1,16 @@
 package com.twoilya.lonelyboardgamer.tables
 
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.twoilya.lonelyboardgamer.geo.getDistance
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.io.IOException
 import kotlin.math.min
+import kotlin.math.round
 
 object UsersLocations : Table() {
     val id: Column<String> = reference("id", UsersProfileInfo.id)
@@ -59,5 +66,13 @@ data class DistanceCredentials(
     val id: String,
     val firstName: String,
     val secondName: String,
+    @JsonSerialize(using = PrettyDistanceSerializer::class)
     val distance: Double
 )
+
+class PrettyDistanceSerializer: JsonSerializer<Double>() {
+    @Throws(IOException::class, JsonProcessingException::class)
+    override fun serialize(value: Double, gen: JsonGenerator?, serializers: SerializerProvider?) {
+        gen?.writeObject(if (value > 1.0) {"$value км"} else {"${value * 1000} м"})
+    }
+}
