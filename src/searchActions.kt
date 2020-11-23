@@ -15,23 +15,29 @@ fun searchActions(route: Route) {
             get("") {
                 call.principal<Ticket>()?.id?.let {
                     call.respond(
-                        ServerResponse(
-                            0,
-                            UsersLocations.findNearest(
-                                it,
-                                call.parameters["limit"]?.toIntOrNull()
-                                    ?: throw WrongDataFormatException("Wrong format for limit parameter"),
-                                call.parameters["offset"]?.toIntOrNull()
-                                    ?: throw WrongDataFormatException("Wrong format for offset parameter")
+                        try {
+                            ServerResponse(
+                                0,
+                                UsersLocations.findNearest(
+                                    it,
+                                    call.parameters["limit"]?.toInt(),
+                                    call.parameters["offset"]?.toInt()
+                                )
                             )
-                        )
+                        } catch (exception: NumberFormatException) {
+                            throw WrongDataFormatException("Limit or offset have wrong format")
+                        }
                     )
                 }
             }
             get("/byId") {
                 call.principal<Ticket>()?.id?.let {
                     call.respond(
-                        UsersProfileInfo.find(it)?.onlyPublic()
+                        UsersProfileInfo.find(
+                            call.parameters["id"]
+                                ?: throw InfoMissingException("No id provided")
+                        )
+                            ?.onlyPublic()
                             ?: throw ElementWasNotFoundException("No user with such id")
                     )
                 }
