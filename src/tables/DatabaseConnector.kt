@@ -16,7 +16,7 @@ object DatabaseConnector {
                 UsersProfileInfo,
                 BGCategories,
                 BGMechanics,
-                UserLocations
+                UsersLocations
             )
         }
     }

@@ -1,11 +1,11 @@
 package com.twoilya.lonelyboardgamer.auth
 
-import com.twoilya.lonelyboardgamer.AuthorizationException
 import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
 import com.twoilya.lonelyboardgamer.InfoMissingException
 import com.twoilya.lonelyboardgamer.ServerResponse
-import com.twoilya.lonelyboardgamer.vk.VKConnector
 import com.twoilya.lonelyboardgamer.tables.UserUtils
+import com.twoilya.lonelyboardgamer.tables.UsersLoginInfo
+import com.twoilya.lonelyboardgamer.vk.VKConnector
 import io.ktor.application.call
 import io.ktor.request.receiveParameters
 import io.ktor.response.respond
@@ -18,7 +18,7 @@ fun loginRoute(route: Routing) {
             val vkAccessToken =
                 call.receiveParameters()["VKAccessToken"] ?: throw InfoMissingException("No token provided")
             val userId = VKConnector.checkToken(vkAccessToken)
-            if (!UserUtils.isExist(userId)) {
+            if (!UsersLoginInfo.isExist(userId)) {
                 throw ElementWasNotFoundException("This user does not exist")
             }
             call.respond(ServerResponse(0, JwtConfig.makeToken(userId)))
@@ -32,7 +32,7 @@ fun registerRoute(route: Routing) {
             val parameters = call.receiveParameters()
             val vkAccessToken = parameters["VKAccessToken"] ?: throw InfoMissingException("No token provided")
             val userId = VKConnector.checkToken(vkAccessToken)
-            if (UserUtils.isExist(userId)) {
+            if (UsersLoginInfo.isExist(userId)) {
                 throw ElementWasNotFoundException("This user already exist")
             }
             UserUtils.addUser(userId, parameters)

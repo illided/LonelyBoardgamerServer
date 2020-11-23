@@ -5,7 +5,7 @@ import com.twoilya.lonelyboardgamer.auth.JwtConfig
 import com.twoilya.lonelyboardgamer.auth.loginRoute
 import com.twoilya.lonelyboardgamer.auth.registerRoute
 import com.twoilya.lonelyboardgamer.tables.DatabaseConnector
-import com.twoilya.lonelyboardgamer.tables.UserUtils
+import com.twoilya.lonelyboardgamer.tables.UsersLoginInfo
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.application.Application
 import io.ktor.application.call
@@ -59,7 +59,7 @@ fun Application.module(testing: Boolean = false) {
                 validate { jwtCredential ->
                     val id = jwtCredential.payload.claims["id"]?.asString() ?: return@validate null
                     val iat = jwtCredential.payload.claims["iat"]?.asDate() ?: return@validate null
-                    if (UserUtils.isUserLoggedIn(id, iat)) {
+                    if (UsersLoginInfo.isUserLoggedIn(id, iat)) {
                         Ticket(id)
                     } else {
                         null
@@ -73,6 +73,7 @@ fun Application.module(testing: Boolean = false) {
             registerRoute(this)
             authenticate {
                 profileActions(this)
+                searchActions(this)
             }
         }
     }.start(wait = true)
