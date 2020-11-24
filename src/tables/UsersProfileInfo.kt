@@ -55,12 +55,23 @@ object UsersProfileInfo : Table() {
 }
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class ProfileInfo(
+data class ProfileInfo (
     val id: String,
     val firstName: String,
     val secondName: String,
-    val address: String,
+    val address: String? = null,
     val prefCategories: List<String>,
     val prefMechanics: List<String>,
     val description: String
-)
+) {
+    fun onlyPublic(): ProfileInfo {
+        return ProfileInfo(
+            id = id,
+            firstName = firstName,
+            secondName = secondName,
+            prefCategories = prefCategories,
+            prefMechanics = prefMechanics,
+            description = description
+        )
+    }
+}

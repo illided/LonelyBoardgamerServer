@@ -2,6 +2,7 @@ package com.twoilya.lonelyboardgamer.vk
 
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.twoilya.lonelyboardgamer.AuthorizationException
+import com.twoilya.lonelyboardgamer.WrongDataFormatException
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.client.HttpClient
 import io.ktor.client.features.json.JacksonSerializer
@@ -25,14 +26,15 @@ object VKConnector {
             try {
                 client.get { url(url) }
             } catch (e: JsonMappingException) {
-                println(e.message)
                 throw exception
             }
         }
     }
 
     suspend fun checkToken(token: String): String {
-        require(token.matches(regexForToken)) { "Wrong token format" }
+        if (!token.matches(regexForToken)) {
+            throw WrongDataFormatException("Invalid access token format")
+        }
 
         return connectAndGet<CheckTokenResponse>(
             url = "$CHECK_TOKEN?token=$token&$SERVER_TOKEN&$VK_API_VERSION",
