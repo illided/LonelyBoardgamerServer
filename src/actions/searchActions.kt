@@ -1,5 +1,7 @@
-package com.twoilya.lonelyboardgamer
+package com.twoilya.lonelyboardgamer.actions
 
+import actions.commands.search.SearchNearest
+import com.twoilya.lonelyboardgamer.*
 import com.twoilya.lonelyboardgamer.tables.UsersLocations
 import com.twoilya.lonelyboardgamer.tables.UsersProfileInfo
 import io.ktor.application.call
@@ -18,11 +20,7 @@ fun searchActions(route: Route) {
                         try {
                             ServerResponse(
                                 0,
-                                UsersLocations.findNearest(
-                                    it,
-                                    call.parameters["limit"]?.toInt(),
-                                    call.parameters["offset"]?.toInt()
-                                )
+                                SearchNearest().execute(it, call.parameters)
                             )
                         } catch (exception: NumberFormatException) {
                             throw WrongDataFormatException("Limit or offset have wrong format")

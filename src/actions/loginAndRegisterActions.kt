@@ -1,10 +1,11 @@
-package com.twoilya.lonelyboardgamer.auth
+package com.twoilya.lonelyboardgamer.actions
 
 import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
 import com.twoilya.lonelyboardgamer.InfoMissingException
 import com.twoilya.lonelyboardgamer.ServerResponse
-import com.twoilya.lonelyboardgamer.tables.UserUtils
+import com.twoilya.lonelyboardgamer.auth.JwtConfig
 import com.twoilya.lonelyboardgamer.tables.UsersLoginInfo
+import com.twoilya.lonelyboardgamer.actions.commands.register.AddUser
 import com.twoilya.lonelyboardgamer.vk.VKConnector
 import io.ktor.application.call
 import io.ktor.request.receiveParameters
@@ -21,7 +22,9 @@ fun loginRoute(route: Routing) {
             if (!UsersLoginInfo.isExist(userId)) {
                 throw ElementWasNotFoundException("This user does not exist")
             }
-            call.respond(ServerResponse(0, JwtConfig.makeToken(userId)))
+            call.respond(ServerResponse(0,
+                JwtConfig.makeToken(userId)
+            ))
         }
     }
 }
@@ -35,8 +38,11 @@ fun registerRoute(route: Routing) {
             if (UsersLoginInfo.isExist(userId)) {
                 throw ElementWasNotFoundException("This user already exist")
             }
-            UserUtils.addUser(userId, parameters)
-            call.respond(ServerResponse(0, JwtConfig.makeToken(userId)))
+            AddUser()
+                .execute(userId, parameters)
+            call.respond(ServerResponse(0,
+                JwtConfig.makeToken(userId)
+            ))
         }
     }
 }

@@ -1,9 +1,14 @@
-package com.twoilya.lonelyboardgamer
+package com.twoilya.lonelyboardgamer.actions
 
+import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
+import com.twoilya.lonelyboardgamer.InfoMissingException
+import com.twoilya.lonelyboardgamer.ServerResponse
+import com.twoilya.lonelyboardgamer.Ticket
 import com.twoilya.lonelyboardgamer.tables.BGCategories
 import com.twoilya.lonelyboardgamer.tables.BGMechanics
-import com.twoilya.lonelyboardgamer.tables.UserUtils
 import com.twoilya.lonelyboardgamer.tables.UsersProfileInfo
+import com.twoilya.lonelyboardgamer.actions.commands.profile.LogOutCommand
+import com.twoilya.lonelyboardgamer.actions.commands.profile.ChangeAddress
 import io.ktor.application.call
 import io.ktor.auth.principal
 import io.ktor.request.receiveParameters
@@ -25,7 +30,7 @@ fun profileActions(route: Route) {
 
             post("/logout") {
                 call.principal<Ticket>()?.id?.let {
-                    UserUtils.logOut(it)
+                    LogOutCommand().execute(it)
                 }
                     ?: throw ElementWasNotFoundException("Such user does not exist")
                 call.respond(ServerResponse(0, "Logged out"))
@@ -33,7 +38,9 @@ fun profileActions(route: Route) {
 
             route("/change") {
                 post("/description") {
-                    val new = call.receiveParameters()["new"] ?: throw InfoMissingException("No description provided")
+                    val new = call.receiveParameters()["new"] ?: throw InfoMissingException(
+                        "No description provided"
+                    )
                     call.principal<Ticket>()?.id?.let {
                         transaction {
                             UsersProfileInfo.update({ UsersProfileInfo.id eq it }) {
@@ -41,7 +48,12 @@ fun profileActions(route: Route) {
                             }
                         }
                     }
-                    call.respond(ServerResponse(0, "Description changed"))
+                    call.respond(
+                        ServerResponse(
+                            0,
+                            "Description changed"
+                        )
+                    )
                 }
 
                 post("/prefCategories") {
@@ -54,7 +66,12 @@ fun profileActions(route: Route) {
                             }
                         }
                     }
-                    call.respond(ServerResponse(0, "Preferable categories changed"))
+                    call.respond(
+                        ServerResponse(
+                            0,
+                            "Preferable categories changed"
+                        )
+                    )
                 }
 
                 post("/prefMechanics") {
@@ -67,17 +84,18 @@ fun profileActions(route: Route) {
                             }
                         }
                     }
-                    call.respond(ServerResponse(0, "Preferable mechanics changed"))
+                    call.respond(
+                        ServerResponse(
+                            0,
+                            "Preferable mechanics changed"
+                        )
+                    )
                 }
 
                 post("/address") {
-                    val new = call.receiveParameters()["new"] ?: throw InfoMissingException("No address provided")
                     call.principal<Ticket>()?.id?.let {
-                        transaction {
-                            UsersProfileInfo.update({ UsersProfileInfo.id eq it }) {
-                                it[address] = new
-                            }
-                        }
+                        ChangeAddress()
+                            .execute(it, call.receiveParameters())
                     }
                     call.respond(ServerResponse(0, "Address changed"))
                 }

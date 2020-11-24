@@ -7,6 +7,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.url
 import io.ktor.http.encodeURLParameter
+import kotlinx.coroutines.runBlocking
 
 object Geocoder {
     private val addressRegex = "[А-Яа-я. 0-9,-]+".toRegex()
@@ -15,22 +16,24 @@ object Geocoder {
     private const val responseType = "json"
     private val apiKey = dotenv { ignoreIfMissing = true }["TOMTOM_API_KEY"]
 
-    suspend fun getCoordinates(address: String): Pair<String, String> {
+    fun getCoordinates(address: String): Pair<String, String> {
         if (!address.matches(addressRegex)) {
             throw WrongDataFormatException("Wrong address format")
         }
 
-        val response = HttpClient().use { client ->
-            client.get<String> {
-                url(
-                    tomtomAddressForGeocoding +
-                            address.encodeURLParameter() +
-                            "." + responseType +
-                            "?limit=1" +
-                            "&countrySet=" + country +
-                            "&key=" + apiKey
+        val response = runBlocking {
+            HttpClient().use { client ->
+                client.get<String> {
+                    url(
+                        tomtomAddressForGeocoding +
+                                address.encodeURLParameter() +
+                                "." + responseType +
+                                "?limit=1" +
+                                "&countrySet=" + country +
+                                "&key=" + apiKey
 
-                )
+                    )
+                }
             }
         }
         val coordinates = ObjectMapper().readTree(response).at("/results/0/position")

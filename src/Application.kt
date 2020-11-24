@@ -1,9 +1,11 @@
 package com.twoilya.lonelyboardgamer
 
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.twoilya.lonelyboardgamer.actions.profileActions
+import com.twoilya.lonelyboardgamer.actions.searchActions
 import com.twoilya.lonelyboardgamer.auth.JwtConfig
-import com.twoilya.lonelyboardgamer.auth.loginRoute
-import com.twoilya.lonelyboardgamer.auth.registerRoute
+import com.twoilya.lonelyboardgamer.actions.loginRoute
+import com.twoilya.lonelyboardgamer.actions.registerRoute
 import com.twoilya.lonelyboardgamer.tables.DatabaseConnector
 import com.twoilya.lonelyboardgamer.tables.UsersLoginInfo
 import io.github.cdimascio.dotenv.dotenv

@@ -1,7 +1,6 @@
 package com.twoilya.lonelyboardgamer.tables
 
 import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.jodatime.datetime
 import org.jetbrains.exposed.sql.select
@@ -15,14 +14,14 @@ object UsersLoginInfo : Table() {
 
     override val primaryKey = PrimaryKey(id)
 
-    fun isExist(userId: String) = getUserCredentials(userId) != null
+    fun isExist(userId: String) = find(userId) != null
 
     fun isUserLoggedIn(userId: String, iat: Date): Boolean {
-        val user = getUserCredentials(userId)
+        val user = find(userId)
         return !(user == null || user.lastLogout.isAfter(DateTime(iat)))
     }
 
-    private fun getUserCredentials(userId: String): Credentials? {
+    private fun find(userId: String): Credentials? {
         val users = transaction {
             UsersLoginInfo.select { UsersLoginInfo.id eq userId }.limit(1)
                 .map {
