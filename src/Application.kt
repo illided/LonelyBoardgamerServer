@@ -58,14 +58,8 @@ fun Application.module(testing: Boolean = false) {
             jwt {
                 verifier(JwtConfig.verifier)
                 realm = "ktor.io"
-                validate { jwtCredential ->
-                    val id = jwtCredential.payload.claims["id"]?.asString() ?: return@validate null
-                    val iat = jwtCredential.payload.claims["iat"]?.asDate() ?: return@validate null
-                    if (UsersLoginInfo.isUserLoggedIn(id, iat)) {
-                        Ticket(id)
-                    } else {
-                        null
-                    }
+                validate {
+                    JwtConfig.verifyAndGetPrincipal(it)
                 }
             }
         }

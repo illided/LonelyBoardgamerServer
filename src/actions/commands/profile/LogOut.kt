@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import org.joda.time.DateTime
 
-class LogOutCommand() : TableCommand() {
+object LogOut : TableCommand() {
     suspend fun execute(userId: String) {
         dbQuery<Unit> {
             UsersLoginInfo.update({ UsersLoginInfo.id eq userId }) {

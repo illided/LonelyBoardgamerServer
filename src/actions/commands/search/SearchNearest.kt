@@ -16,7 +16,7 @@ import org.jetbrains.exposed.sql.select
 import java.io.IOException
 import kotlin.math.min
 
-class SearchNearest: TableCommand() {
+object SearchNearest: TableCommand() {
     suspend fun execute(userId: String, parameters: Parameters) : List<DistanceCredentials> {
         return findNearest(
             userId,
@@ -78,7 +78,7 @@ class SearchNearest: TableCommand() {
     class PrettyDistanceSerializer: JsonSerializer<Double>() {
         @Throws(IOException::class, JsonProcessingException::class)
         override fun serialize(value: Double, gen: JsonGenerator?, serializers: SerializerProvider?) {
-            gen?.writeObject(if (value > 1.0) {"$value км"} else {"${value * 1000} м"})
+            gen?.writeObject(if (value > 1.0) {"$value км"} else {"${(value * 1000).toInt()} м"})
         }
     }
 }

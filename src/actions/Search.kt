@@ -20,7 +20,7 @@ fun searchActions(route: Route) {
                         try {
                             ServerResponse(
                                 0,
-                                SearchNearest().execute(it, call.parameters)
+                                SearchNearest.execute(it, call.parameters)
                             )
                         } catch (exception: NumberFormatException) {
                             throw WrongDataFormatException("Limit or offset have wrong format")

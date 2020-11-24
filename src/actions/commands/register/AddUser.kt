@@ -11,7 +11,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 
-class AddUser() : TableCommand() {
+object AddUser : TableCommand() {
     suspend fun execute(userId: String, parameters: Parameters) = dbQuery<Unit> {
         val userAddress = parameters["address"] ?: throw InfoMissingException("No address provided")
         val (vkFirstName, vkSecondName) = runBlocking { VKConnector.getName(userId) }

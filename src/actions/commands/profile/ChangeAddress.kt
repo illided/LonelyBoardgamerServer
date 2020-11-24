@@ -9,7 +9,7 @@ import io.ktor.http.Parameters
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 
-class ChangeAddress() : TableCommand() {
+object ChangeAddress : TableCommand() {
     suspend fun execute(userId: String, parameters: Parameters) {
         val new = parameters["new"] ?: throw InfoMissingException(
             "No address provided"

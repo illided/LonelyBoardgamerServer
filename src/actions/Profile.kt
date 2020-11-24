@@ -7,7 +7,7 @@ import com.twoilya.lonelyboardgamer.Ticket
 import com.twoilya.lonelyboardgamer.tables.BGCategories
 import com.twoilya.lonelyboardgamer.tables.BGMechanics
 import com.twoilya.lonelyboardgamer.tables.UsersProfileInfo
-import com.twoilya.lonelyboardgamer.actions.commands.profile.LogOutCommand
+import com.twoilya.lonelyboardgamer.actions.commands.profile.LogOut
 import com.twoilya.lonelyboardgamer.actions.commands.profile.ChangeAddress
 import io.ktor.application.call
 import io.ktor.auth.principal
@@ -30,7 +30,7 @@ fun profileActions(route: Route) {
 
             post("/logout") {
                 call.principal<Ticket>()?.id?.let {
-                    LogOutCommand().execute(it)
+                    LogOut.execute(it)
                 }
                     ?: throw ElementWasNotFoundException("Such user does not exist")
                 call.respond(ServerResponse(0, "Logged out"))
@@ -94,8 +94,7 @@ fun profileActions(route: Route) {
 
                 post("/address") {
                     call.principal<Ticket>()?.id?.let {
-                        ChangeAddress()
-                            .execute(it, call.receiveParameters())
+                        ChangeAddress.execute(it, call.receiveParameters())
                     }
                     call.respond(ServerResponse(0, "Address changed"))
                 }
