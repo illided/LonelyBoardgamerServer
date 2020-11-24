@@ -6,7 +6,6 @@ import com.twoilya.lonelyboardgamer.geo.Geocoder
 import com.twoilya.lonelyboardgamer.tables.UsersLocations
 import com.twoilya.lonelyboardgamer.tables.UsersProfileInfo
 import io.ktor.http.Parameters
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 
 object ChangeAddress : TableCommand() {

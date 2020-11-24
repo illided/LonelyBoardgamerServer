@@ -9,9 +9,10 @@ import org.joda.time.DateTime
 object LogOut : TableCommand() {
     suspend fun execute(userId: String) {
         dbQuery<Unit> {
-            UsersLoginInfo.update({ UsersLoginInfo.id eq userId }) {
-                it[lastLogout] = DateTime(System.currentTimeMillis())
-            }
+            UsersLoginInfo
+                .update({ UsersLoginInfo.id eq userId }) {
+                    it[lastLogout] = DateTime(System.currentTimeMillis())
+                }
         }
     }
 }

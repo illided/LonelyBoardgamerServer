@@ -14,6 +14,7 @@ import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import java.io.IOException
+import kotlin.math.max
 import kotlin.math.min
 
 object SearchNearest: TableCommand() {
@@ -61,8 +62,8 @@ object SearchNearest: TableCommand() {
             val upperBound = lowerBound + (limit ?: nearestPeopleDistances.size)
 
             return@dbQuery nearestPeopleDistances.sortedBy { it.distance }.subList(
-                min(lowerBound, nearestPeopleDistances.size - 1),
-                min(upperBound, nearestPeopleDistances.size - 1)
+                min(lowerBound, max(0, nearestPeopleDistances.size - 1)),
+                min(upperBound, max(0, nearestPeopleDistances.size - 1))
             )
         }
     }
