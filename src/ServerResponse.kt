@@ -1,3 +1,3 @@
 package com.twoilya.lonelyboardgamer
 
-data class ServerResponse(val status: Int, val message: Any)
+data class ServerResponse(val status: Int = 0, val message: Any)

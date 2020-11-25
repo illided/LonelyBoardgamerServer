@@ -13,7 +13,7 @@ fun profileActions(route: Route) {
         route("/profile") {
             get("") {
                 val user = call.principal<Ticket>()?.id!!
-                call.respond(GetPersonalData.execute(user))
+                call.respond(ServerResponse(0, GetPersonalData.execute(user)))
             }
 
             post("/logout") {

@@ -25,8 +25,10 @@ fun searchActions(route: Route) {
 
             get("/byId") {
                 call.respond(
-                    SearchPublicly.execute(call.principal<Ticket>()?.id!!)
-                        ?: throw ElementWasNotFoundException("No user with such id")
+                    ServerResponse(
+                        0, SearchPublicly.execute(call.principal<Ticket>()?.id!!)
+                            ?: throw ElementWasNotFoundException("No user with such id")
+                    )
                 )
             }
         }
