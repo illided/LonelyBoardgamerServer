@@ -1,6 +1,6 @@
 package com.twoilya.lonelyboardgamer.actions
 
-import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
+import com.twoilya.lonelyboardgamer.AuthorizationException
 import com.twoilya.lonelyboardgamer.InfoMissingException
 import com.twoilya.lonelyboardgamer.ServerResponse
 import com.twoilya.lonelyboardgamer.actions.commands.register.AddUser
@@ -21,7 +21,7 @@ fun registerRoute(route: Routing) {
             val vkAccessToken = parameters["VKAccessToken"] ?: throw InfoMissingException("No token provided")
             val userId = VKConnector.checkToken(vkAccessToken)
 
-            if (LoggedInService.isExist(userId)) { throw ElementWasNotFoundException("This user already exist") }
+            if (LoggedInService.isExist(userId)) { throw AuthorizationException("This user already exist") }
             AddUser.execute(userId, parameters)
 
             call.respond(ServerResponse(0, JwtConfig.makeToken(userId)))
