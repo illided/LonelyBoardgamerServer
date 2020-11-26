@@ -14,7 +14,7 @@ object ChangeMechanics: TableCommand() {
 
         dbQuery {
             UsersProfileInfo.update({ UsersProfileInfo.id eq userId }) {
-                it[prefCategories] = BGMechanics.findByName(new).joinToString(",")
+                it[prefMechanics] = BGMechanics.findByName(new).joinToString(",")
             }
         }
     }
