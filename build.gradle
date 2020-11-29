@@ -50,6 +50,8 @@ dependencies {
     implementation 'com.zaxxer:HikariCP:3.4.2'
 
     compile 'io.github.cdimascio:dotenv-kotlin:6.2.1'
+
+    implementation enforcedPlatform('io.zonky.test.postgres:embedded-postgres-binaries-bom:11.6.0')
 }
 
 mainClassName = 'com.twoilya.lonelyboardgamer.ApplicationKt'

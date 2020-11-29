@@ -10,7 +10,7 @@ object BGMechanics : Table() {
     val id: Column<String> = varchar("id", 3)
     val name: Column<String> = varchar("name", 50)
 
-    override val primaryKey = PrimaryKey(id, name)
+    override val primaryKey = PrimaryKey(name)
 
     fun findById(ids: List<String>?): List<String> {
         if (ids == null) {

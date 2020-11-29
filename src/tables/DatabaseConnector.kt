@@ -25,7 +25,6 @@ object DatabaseConnector {
         val dotenv = dotenv {
             ignoreIfMissing = true
         }
-        println(dotenv["MY_SECRET_KEY"])
         val config = HikariConfig()
         config.driverClassName = "org.postgresql.Driver"
         config.jdbcUrl = dotenv["JDBC_DATABASE_URL"]
