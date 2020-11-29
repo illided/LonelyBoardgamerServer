@@ -1,6 +1,7 @@
 package com.twoilya.lonelyboardgamer.geo
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
 import com.twoilya.lonelyboardgamer.WrongDataFormatException
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.client.HttpClient
@@ -39,6 +40,10 @@ object Geocoder {
         val coordinates = ObjectMapper().readTree(response).at("/results/0/position")
         val lat = coordinates.path("lat").asText()
         val lng = coordinates.path("lon").asText()
+
+        if (lat == "" || lng == "")
+            throw ElementWasNotFoundException("Can't associate address with lng and lat")
+
         return lat to lng
     }
 }

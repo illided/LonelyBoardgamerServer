@@ -9,7 +9,7 @@ object UsersProfileInfo : Table() {
     private const val SECOND_NAME_MAX_LENGTH = 20
     private const val PREF_CATEGORIES_MAX_LENGTH = 50
     private const val PREF_MECHANICS_MAX_LENGTH = 50
-    private const val DESCRIPTION_MAX_LENGTH = 250
+    const val DESCRIPTION_MAX_LENGTH = 250
 
     val id: Column<String> = varchar("id", 10)
     val firstName: Column<String> = varchar("firstName", FIRST_NAME_MAX_LENGTH)
