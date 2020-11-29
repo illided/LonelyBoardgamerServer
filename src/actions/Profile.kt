@@ -8,52 +8,50 @@ import io.ktor.auth.principal
 import io.ktor.response.respond
 import io.ktor.routing.*
 
-fun profileActions(route: Route) {
-    route {
-        route("/profile") {
-            get("") {
-                val user = call.principal<Ticket>()?.id!!
-                call.respond(ServerResponse(0, GetPersonalData.execute(user)))
+fun Route.profileActions() {
+    route("/profile") {
+        get("") {
+            val user = call.principal<Ticket>()?.id!!
+            call.respond(ServerResponse(0, GetPersonalData.execute(user)))
+        }
+
+        post("/logout") {
+            val user = call.principal<Ticket>()?.id!!
+            LogOut.execute(user)
+            call.respond(ServerResponse(0, "Logged out"))
+        }
+
+        route("/change") {
+            post("/description") {
+                ChangeDescription.execute(
+                    call.principal<Ticket>()?.id!!,
+                    call.parameters
+                )
+                call.respond(ServerResponse(0, "Description changed"))
             }
 
-            post("/logout") {
-                val user = call.principal<Ticket>()?.id!!
-                LogOut.execute(user)
-                call.respond(ServerResponse(0, "Logged out"))
+            post("/prefCategories") {
+                ChangeCategories.execute(
+                    call.principal<Ticket>()?.id!!,
+                    call.parameters
+                )
+                call.respond(ServerResponse(0, "Preferable categories changed"))
             }
 
-            route("/change") {
-                post("/description") {
-                    ChangeDescription.execute(
-                        call.principal<Ticket>()?.id!!,
-                        call.parameters
-                    )
-                    call.respond(ServerResponse(0, "Description changed"))
-                }
+            post("/prefMechanics") {
+                ChangeMechanics.execute(
+                    call.principal<Ticket>()?.id!!,
+                    call.parameters
+                )
+                call.respond(ServerResponse(0, "Preferable mechanics changed"))
+            }
 
-                post("/prefCategories") {
-                    ChangeCategories.execute(
-                        call.principal<Ticket>()?.id!!,
-                        call.parameters
-                    )
-                    call.respond(ServerResponse(0, "Preferable categories changed"))
-                }
-
-                post("/prefMechanics") {
-                    ChangeMechanics.execute(
-                        call.principal<Ticket>()?.id!!,
-                        call.parameters
-                    )
-                    call.respond(ServerResponse(0, "Preferable mechanics changed"))
-                }
-
-                post("/address") {
-                    ChangeAddress.execute(
-                        call.principal<Ticket>()?.id!!,
-                        call.parameters
-                    )
-                    call.respond(ServerResponse(0, "Address changed"))
-                }
+            post("/address") {
+                ChangeAddress.execute(
+                    call.principal<Ticket>()?.id!!,
+                    call.parameters
+                )
+                call.respond(ServerResponse(0, "Address changed"))
             }
         }
     }

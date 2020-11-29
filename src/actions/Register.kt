@@ -13,18 +13,18 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.post
 
-fun registerRoute(route: Routing) {
-    route {
-        post("/register") {
-            val parameters = call.receiveParameters()
+fun Routing.registerRoute() {
+    post("/register") {
+        val parameters = call.receiveParameters()
 
-            val vkAccessToken = parameters["VKAccessToken"] ?: throw InfoMissingException("No token provided")
-            val userId = VKConnector.checkToken(vkAccessToken)
+        val vkAccessToken = parameters["VKAccessToken"] ?: throw InfoMissingException("No token provided")
+        val userId = VKConnector.checkToken(vkAccessToken)
 
-            if (LoggedInService.isExist(userId)) { throw AuthorizationException("This user already exist") }
-            AddUser.execute(userId, parameters)
-
-            call.respond(ServerResponse(0, JwtConfig.makeToken(userId)))
+        if (LoggedInService.isExist(userId)) {
+            throw AuthorizationException("This user already exist")
         }
+        AddUser.execute(userId, parameters)
+
+        call.respond(ServerResponse(0, JwtConfig.makeToken(userId)))
     }
 }

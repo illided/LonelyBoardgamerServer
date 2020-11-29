@@ -14,17 +14,17 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.post
 
-fun loginRoute(route: Routing) {
-    route {
-        post("/login") {
-            val parameters = call.receiveParameters()
+fun Routing.loginRoute() {
+    post("/login") {
+        val parameters = call.receiveParameters()
 
-            val vkAccessToken = parameters["VKAccessToken"] ?: throw InfoMissingException("No token provided")
+        val vkAccessToken = parameters["VKAccessToken"] ?: throw InfoMissingException("No token provided")
 
-            val userId = VKConnector.checkToken(vkAccessToken)
-            if (!LoggedInService.isExist(userId)) { throw ElementWasNotFoundException("This user does not exist") }
-            call.respond(ServerResponse(0, JwtConfig.makeToken(userId)))
+        val userId = VKConnector.checkToken(vkAccessToken)
+        if (!LoggedInService.isExist(userId)) {
+            throw ElementWasNotFoundException("This user does not exist")
         }
+        call.respond(ServerResponse(0, JwtConfig.makeToken(userId)))
     }
 }
 
