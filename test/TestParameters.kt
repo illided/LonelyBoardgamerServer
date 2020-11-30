@@ -13,11 +13,13 @@ class TestParameters(override val caseInsensitiveName: Boolean = false) : Parame
 
     operator fun set(s: String, value: String) = params.add(Param(s, listOf(value)))
 
-    override operator fun get(name: String): String {
+    override operator fun get(name: String): String? {
         val listOfParams = getAll(name)
-        if (listOfParams == null || listOfParams.size != 1) {
+            ?: return null
+
+        if (listOfParams.size != 1)
             throw IllegalArgumentException("Too many params for custom params class")
-        }
+
         return listOfParams.component1()
     }
 

@@ -14,8 +14,8 @@ import org.joda.time.DateTime
 object AddUser : TableCommand() {
     suspend fun execute(userId: String, parameters: Parameters) = dbQuery<Unit> {
         val userAddress = parameters["address"] ?: throw InfoMissingException("No address provided")
-        val (vkFirstName, vkSecondName) = runBlocking { VKConnector.getName(userId) }
-        val (lat, lng) = runBlocking { Geocoder.getCoordinates(userAddress) }
+        val (vkFirstName, vkSecondName) = VKConnector.getName(userId)
+        val (lat, lng) = Geocoder.getCoordinates(userAddress)
 
         UsersLoginInfo.insert {
             it[id] = userId

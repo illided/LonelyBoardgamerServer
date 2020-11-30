@@ -6,7 +6,11 @@ import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
 import com.twoilya.lonelyboardgamer.WrongDataFormatException
 import com.twoilya.lonelyboardgamer.actions.commands.profile.*
 import com.twoilya.lonelyboardgamer.auth.LoggedInService
+import com.twoilya.lonelyboardgamer.geo.Geocoder
 import com.twoilya.lonelyboardgamer.tables.*
+import io.mockk.every
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Database
@@ -39,6 +43,27 @@ internal class ProfileKtTest {
             prefCategories = emptyList()
         )
         assertEquals(expected, gotFromDB)
+    }
+
+    @Test
+    fun `Lat and lon changed when address changed`() {
+        val parameters = TestParameters()
+        parameters["new"] = "Russia"
+
+        mockkObject(Geocoder)
+        every { Geocoder.getCoordinates("Russia") } returns ("70.0" to "70.0")
+
+        runBlocking { ChangeAddress.execute("0", parameters) }
+        assertEquals(
+            "70.0,70.0",
+            transaction {
+                UsersLocations
+                    .select { UsersLocations.id eq "0" }
+                    .map { "${it[UsersLocations.latitude]},${it[UsersLocations.longitude]}" }
+            }.component1()
+        )
+
+        unmockkAll()
     }
 
     @Test
