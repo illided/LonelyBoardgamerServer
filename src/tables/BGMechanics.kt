@@ -1,5 +1,6 @@
 package com.twoilya.lonelyboardgamer.tables
 
+import com.twoilya.lonelyboardgamer.BadDataException
 import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
@@ -25,6 +26,9 @@ object BGMechanics : Table() {
         if (names == null) {
             return emptyList()
         }
+
+        if (names.toSet().size != names.size)
+            throw BadDataException("Duplicate of mechanics presented")
 
         return transaction {
             BGMechanics.select { name inList names }.map { it[BGMechanics.id] }

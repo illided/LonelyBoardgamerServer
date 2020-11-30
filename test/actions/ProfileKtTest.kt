@@ -1,29 +1,32 @@
 package actions
 
 import TestParameters
+import com.twoilya.lonelyboardgamer.BadDataException
 import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
 import com.twoilya.lonelyboardgamer.WrongDataFormatException
-import com.twoilya.lonelyboardgamer.actions.commands.profile.ChangeDescription
-import com.twoilya.lonelyboardgamer.actions.commands.profile.GetPersonalData
+import com.twoilya.lonelyboardgamer.actions.commands.profile.*
+import com.twoilya.lonelyboardgamer.auth.LoggedInService
 import com.twoilya.lonelyboardgamer.tables.*
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.transactions.transaction
-import javax.sql.DataSource
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils.create
+import org.jetbrains.exposed.sql.batchInsert
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.*
+import java.time.Instant
+import java.util.*
+import javax.sql.DataSource
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 internal class ProfileKtTest {
 
     @Test
+    @Order(1)
     fun `Profile data received when user exists`() {
         val gotFromDB = runBlocking { GetPersonalData.execute("0") }
         val expected = ProfileInfo(
@@ -78,6 +81,79 @@ internal class ProfileKtTest {
         }
     }
 
+    @Test
+    fun `Categories changed when input is correct`() {
+        val parameters = TestParameters()
+        parameters["new"] = "Test 1,Test 2"
+        runBlocking { ChangeCategories.execute("0", parameters) }
+        assertEquals(
+            "1,2",
+            transaction {
+                UsersProfileInfo
+                    .select { UsersProfileInfo.id eq "0" }
+                    .map { it[UsersProfileInfo.prefCategories].toString() }
+            }.component1()
+        )
+    }
+
+    @Test
+    fun `Categories changed when input is correct and have all categories`() {
+        val parameters = TestParameters()
+        parameters["new"] = "Test 1,Test 2,Test 3,Test 4"
+        runBlocking { ChangeCategories.execute("0", parameters) }
+        assertEquals(
+            "1,2,3,4",
+            transaction {
+                UsersProfileInfo
+                    .select { UsersProfileInfo.id eq "0" }
+                    .map { it[UsersProfileInfo.prefCategories].toString() }
+            }.component1()
+        )
+    }
+
+    @Test
+    fun `Exception thrown when try to change pref cats not all categories found`() {
+        val parameters = TestParameters()
+        parameters["new"] = "Test 1,Bad cat"
+        assertThrows(ElementWasNotFoundException::class.java) {
+            runBlocking { ChangeCategories.execute("0", parameters) }
+        }
+    }
+
+    @Test
+    fun `Exception thrown when try to change pref mecs and not all mechanics found`() {
+        val parameters = TestParameters()
+        parameters["new"] = "Test 1,Bad mec"
+        assertThrows(ElementWasNotFoundException::class.java) {
+            runBlocking { ChangeMechanics.execute("0", parameters) }
+        }
+    }
+
+    @Test
+    fun `Exception thrown when duplicate of categories presented`() {
+        val parameters = TestParameters()
+        parameters["new"] = "Test 1,Duplicate cat,Duplicate cat"
+        assertThrows(BadDataException::class.java) {
+            runBlocking { ChangeCategories.execute("0", parameters) }
+        }
+    }
+
+    @Test
+    fun `Exception thrown when duplicate of mechanics presented`() {
+        val parameters = TestParameters()
+        parameters["new"] = "Test 1,Duplicate mec,Duplicate mec"
+        assertThrows(BadDataException::class.java) {
+            runBlocking { ChangeMechanics.execute("0", parameters) }
+        }
+    }
+
+    @Test
+    fun `User not logged in when he logged out`() {
+        val iat = Date.from(Instant.now())
+        runBlocking { LogOut.execute("0") }
+        assertFalse(runBlocking { LoggedInService.isUserLoggedIn("0", iat) })
+    }
+
     companion object {
         private val embeddedPostgres = EmbeddedPostgres.start()
         private val dataSource: DataSource = embeddedPostgres.postgresDatabase
@@ -86,6 +162,14 @@ internal class ProfileKtTest {
         @BeforeAll
         fun bootstrap() {
             Database.connect(dataSource)
+
+            val testList = listOf(
+                "1" to "Test 1",
+                "2" to "Test 2",
+                "3" to "Test 3",
+                "4" to "Test 4"
+            )
+
             transaction {
                 create(
                     UsersLoginInfo,
@@ -111,6 +195,18 @@ internal class ProfileKtTest {
                     it[id] = "0"
                     it[latitude] = 50.0
                     it[longitude] = 50.0
+                }
+                BGCategories.batchInsert(
+                    testList
+                ) { cat ->
+                    this[BGCategories.id] = cat.first
+                    this[BGCategories.name] = cat.second
+                }
+                BGMechanics.batchInsert(
+                    testList
+                ) { mec ->
+                    this[BGMechanics.id] = mec.first
+                    this[BGMechanics.name] = mec.second
                 }
             }
         }

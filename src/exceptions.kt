@@ -19,3 +19,7 @@ class ElementWasNotFoundException(message: String) : WithCodeException(message) 
 class WrongDataFormatException(message: String) : WithCodeException(message) {
     override val code: Int = 4
 }
+
+class BadDataException(message: String) : WithCodeException(message) {
+    override val code: Int = 5
+}
