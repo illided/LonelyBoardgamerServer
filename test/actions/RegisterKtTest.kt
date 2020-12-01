@@ -52,7 +52,7 @@ internal class RegisterKtTest {
     }
 
     @Test
-    fun `User not created when necessary info not provided and `() {
+    fun `User not created when necessary info not provided`() {
         val myParams = TestParameters()
         myParams["VKAccessToken"] = "token"
 
