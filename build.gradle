@@ -13,7 +13,6 @@ apply plugin: 'application'
 
 group 'com.twoilya.lonelyboardgamer'
 version '0.0.1'
-mainClassName = "io.ktor.server.netty.EngineMain"
 
 sourceSets {
     main.kotlin.srcDirs = main.java.srcDirs = ['src']
@@ -65,8 +64,11 @@ dependencies {
     compile group: 'io.zonky.test', name: 'embedded-postgres', version: '1.2.8'
 
     // junit
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.0'
+
+    // mockk
+    testCompile group: 'io.mockk', name: 'mockk', version: '1.10.2'
 }
 
 mainClassName = 'com.twoilya.lonelyboardgamer.ApplicationKt'

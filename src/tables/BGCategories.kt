@@ -1,5 +1,6 @@
 package com.twoilya.lonelyboardgamer.tables
 
+import com.twoilya.lonelyboardgamer.BadDataException
 import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
@@ -26,8 +27,13 @@ object BGCategories : Table() {
             return emptyList()
         }
 
+        if (names.toSet().size != names.size)
+            throw BadDataException("Duplicate of categories presented")
+
         return transaction {
             BGCategories.select { BGCategories.name inList names }.map { it[BGCategories.id] }
-        }.also { if (it.size != names.size) throw ElementWasNotFoundException("Not all categories were founded") }
+        }.also {
+            if (it.size != names.size) throw ElementWasNotFoundException("Not all categories were founded")
+        }
     }
 }
