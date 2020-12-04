@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.twoilya.lonelyboardgamer.BadDataException
+import com.twoilya.lonelyboardgamer.actions.commands.batch
 import com.twoilya.lonelyboardgamer.geo.getDistance
 import com.twoilya.lonelyboardgamer.tables.UsersLocations
 import com.twoilya.lonelyboardgamer.tables.UsersProfileInfo
@@ -67,19 +68,7 @@ object SearchNearest : TableCommand<List<SearchNearest.DistanceCredentials>>() {
             )
         }
 
-        val lowerBound = offset ?: 0
-        if (lowerBound < 0)
-            throw BadDataException("Offset cant be negative")
-
-        val upperBound = lowerBound + (limit ?: nearestPeopleDistances.size)
-        if (upperBound < lowerBound)
-            throw BadDataException("Limit can't be negative")
-
-        return nearestPeopleDistances.sortedBy { it.distance }.subList(
-            min(lowerBound, max(0, nearestPeopleDistances.size)),
-            min(upperBound, max(0, nearestPeopleDistances.size))
-        )
-
+        return nearestPeopleDistances.sortedBy { it.distance }.batch(offset, limit)
     }
 
     data class DistanceCredentials(
