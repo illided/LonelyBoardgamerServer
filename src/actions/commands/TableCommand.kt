@@ -9,17 +9,5 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
 abstract class TableCommand {
-    suspend fun <T> dbQuery(block: () -> T): T =
-        withContext(Dispatchers.IO) {
-            transaction { block() }
-        }
 
-    suspend fun <T> Table.findInTable(userId: String, idColumn: Column<String>, mapper: (ResultRow) -> T) : T? {
-        return dbQuery {
-            val searchResult = select { idColumn eq userId }
-                .limit(1)
-                .map { mapper(it) }
-            if (searchResult.size == 1) searchResult[0] else null
-        }
-    }
 }

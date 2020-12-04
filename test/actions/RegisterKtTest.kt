@@ -5,7 +5,7 @@ import com.twoilya.lonelyboardgamer.BadDataException
 import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
 import com.twoilya.lonelyboardgamer.InfoMissingException
 import com.twoilya.lonelyboardgamer.actions.commands.register.AddUser
-import com.twoilya.lonelyboardgamer.auth.LoggedInService
+import com.twoilya.lonelyboardgamer.auth.isExist
 import com.twoilya.lonelyboardgamer.geo.Geocoder
 import com.twoilya.lonelyboardgamer.tables.*
 import com.twoilya.lonelyboardgamer.vk.VKConnector
@@ -19,7 +19,8 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import javax.sql.DataSource
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -37,7 +38,7 @@ internal class RegisterKtTest {
 
         runBlocking { AddUser.execute("0", myParams) }
 
-        assertTrue(runBlocking { LoggedInService.isExist("0") })
+        assertTrue(runBlocking { isExist("0") })
     }
 
     @Test
@@ -48,7 +49,7 @@ internal class RegisterKtTest {
 
         runBlocking { AddUser.execute("1", myParams) }
 
-        assertTrue(runBlocking { LoggedInService.isExist("1") })
+        assertTrue(runBlocking {isExist("1") })
     }
 
     @Test

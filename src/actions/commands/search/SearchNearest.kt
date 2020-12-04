@@ -10,6 +10,7 @@ import com.twoilya.lonelyboardgamer.BadDataException
 import com.twoilya.lonelyboardgamer.geo.getDistance
 import com.twoilya.lonelyboardgamer.tables.UsersLocations
 import com.twoilya.lonelyboardgamer.tables.UsersProfileInfo
+import com.twoilya.lonelyboardgamer.tables.dbQuery
 import io.ktor.http.Parameters
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.and

@@ -4,6 +4,7 @@ import actions.commands.TableCommand
 import com.twoilya.lonelyboardgamer.InfoMissingException
 import com.twoilya.lonelyboardgamer.tables.BGMechanics
 import com.twoilya.lonelyboardgamer.tables.UsersProfileInfo
+import com.twoilya.lonelyboardgamer.tables.dbQuery
 import io.ktor.http.Parameters
 import org.jetbrains.exposed.sql.update
 

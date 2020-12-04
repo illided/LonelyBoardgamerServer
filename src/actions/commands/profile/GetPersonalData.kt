@@ -2,10 +2,7 @@ package com.twoilya.lonelyboardgamer.actions.commands.profile
 
 import actions.commands.TableCommand
 import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
-import com.twoilya.lonelyboardgamer.tables.BGCategories
-import com.twoilya.lonelyboardgamer.tables.BGMechanics
-import com.twoilya.lonelyboardgamer.tables.ProfileInfo
-import com.twoilya.lonelyboardgamer.tables.UsersProfileInfo
+import com.twoilya.lonelyboardgamer.tables.*
 import org.jetbrains.exposed.sql.ResultRow
 
 object GetPersonalData : TableCommand() {

@@ -5,6 +5,7 @@ import com.twoilya.lonelyboardgamer.InfoMissingException
 import com.twoilya.lonelyboardgamer.geo.Geocoder
 import com.twoilya.lonelyboardgamer.tables.UsersLocations
 import com.twoilya.lonelyboardgamer.tables.UsersProfileInfo
+import com.twoilya.lonelyboardgamer.tables.dbQuery
 import io.ktor.http.Parameters
 import org.jetbrains.exposed.sql.update
 

@@ -1,10 +1,7 @@
 package com.twoilya.lonelyboardgamer.actions.commands.search
 
 import actions.commands.TableCommand
-import com.twoilya.lonelyboardgamer.tables.BGCategories
-import com.twoilya.lonelyboardgamer.tables.BGMechanics
-import com.twoilya.lonelyboardgamer.tables.ProfileInfo
-import com.twoilya.lonelyboardgamer.tables.UsersProfileInfo
+import com.twoilya.lonelyboardgamer.tables.*
 import org.jetbrains.exposed.sql.ResultRow
 
 object SearchPublicly : TableCommand() {

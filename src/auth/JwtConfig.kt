@@ -24,7 +24,7 @@ object JwtConfig {
     suspend fun verifyAndGetPrincipal(jwtCredential: JWTCredential) : Ticket? {
         val id = jwtCredential.payload.claims["id"]?.asString() ?: return null
         val iat = jwtCredential.payload.claims["iat"]?.asDate() ?: return null
-        return if (LoggedInService.isUserLoggedIn(id, iat)) {
+        return if (isUserLoggedIn(id, iat)) {
             Ticket(id)
         } else {
             null

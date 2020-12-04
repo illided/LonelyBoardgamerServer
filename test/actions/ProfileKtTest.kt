@@ -5,7 +5,7 @@ import com.twoilya.lonelyboardgamer.BadDataException
 import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
 import com.twoilya.lonelyboardgamer.WrongDataFormatException
 import com.twoilya.lonelyboardgamer.actions.commands.profile.*
-import com.twoilya.lonelyboardgamer.auth.LoggedInService
+import com.twoilya.lonelyboardgamer.auth.isUserLoggedIn
 import com.twoilya.lonelyboardgamer.geo.Geocoder
 import com.twoilya.lonelyboardgamer.tables.*
 import io.mockk.every
@@ -176,7 +176,7 @@ internal class ProfileKtTest {
     fun `User not logged in when he logged out`() {
         val iat = Date.from(Instant.now())
         runBlocking { LogOut.execute("0") }
-        assertFalse(runBlocking { LoggedInService.isUserLoggedIn("0", iat) })
+        assertFalse(runBlocking { isUserLoggedIn("0", iat) })
     }
 
     companion object {
