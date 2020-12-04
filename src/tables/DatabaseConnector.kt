@@ -25,15 +25,16 @@ object DatabaseConnector {
         val dotenv = dotenv {
             ignoreIfMissing = true
         }
-        val config = HikariConfig()
-        config.driverClassName = "org.postgresql.Driver"
-        config.jdbcUrl = dotenv["JDBC_DATABASE_URL"]
-        config.username = dotenv["JDBC_DATABASE_USERNAME"]
-        config.password = dotenv["JDBC_DATABASE_PASSWORD"]
-        config.maximumPoolSize = 3
-        config.isAutoCommit = false
-        config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
-        config.validate()
+        val config = HikariConfig().apply{
+            driverClassName = "org.postgresql.Driver"
+            jdbcUrl = dotenv["JDBC_DATABASE_URL"]
+            username = dotenv["JDBC_DATABASE_USERNAME"]
+            password = dotenv["JDBC_DATABASE_PASSWORD"]
+            maximumPoolSize = 3
+            isAutoCommit = false
+            transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+            validate()
+        }
         return HikariDataSource(config)
     }
 }
