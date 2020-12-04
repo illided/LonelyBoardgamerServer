@@ -11,8 +11,8 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 
-object AddUser : TableCommand() {
-    suspend fun execute(userId: String, parameters: Parameters) = dbQuery<Unit> {
+object AddUser : TableCommand<Unit>() {
+    override fun query(userId: String, parameters: Parameters) {
         val userAddress = parameters["address"] ?: throw InfoMissingException("No address provided")
         val (vkFirstName, vkSecondName) = VKConnector.getName(userId)
         val (lat, lng) = Geocoder.getCoordinates(userAddress)

@@ -32,7 +32,7 @@ internal class ProfileKtTest {
     @Test
     @Order(1)
     fun `Profile data received when user exists`() {
-        val gotFromDB = runBlocking { GetPersonalData.execute("0") }
+        val gotFromDB = runBlocking { GetPersonalData.run("0") }
         val expected = ProfileInfo(
             id = "0",
             firstName = "John",
@@ -53,7 +53,7 @@ internal class ProfileKtTest {
         mockkObject(Geocoder)
         every { Geocoder.getCoordinates("Russia") } returns ("70.0" to "70.0")
 
-        runBlocking { ChangeAddress.execute("0", parameters) }
+        runBlocking { ChangeAddress.run("0", parameters) }
         assertEquals(
             "70.0,70.0",
             transaction {
@@ -69,7 +69,7 @@ internal class ProfileKtTest {
     @Test
     fun `Exception thrown when tries to get data about non existing user`() {
         assertThrows(ElementWasNotFoundException::class.java) {
-            runBlocking { GetPersonalData.execute("1") }
+            runBlocking { GetPersonalData.run("1") }
         }
     }
 
@@ -77,7 +77,7 @@ internal class ProfileKtTest {
     fun `Description changed when user exists and params correct`() {
         val params = TestParameters()
         params["new"] = "They took my car"
-        runBlocking { ChangeDescription.execute("0", params) }
+        runBlocking { ChangeDescription.run("0", params) }
         assertEquals(
             "They took my car",
             transaction {
@@ -102,7 +102,7 @@ internal class ProfileKtTest {
                 " evidence of that horror—that thing on the doorstep."
 
         assertThrows(WrongDataFormatException::class.java) {
-            runBlocking { ChangeDescription.execute("0", params) }
+            runBlocking { ChangeDescription.run("0", params) }
         }
     }
 
@@ -110,7 +110,7 @@ internal class ProfileKtTest {
     fun `Categories changed when input is correct`() {
         val parameters = TestParameters()
         parameters["new"] = "Test 1,Test 2"
-        runBlocking { ChangeCategories.execute("0", parameters) }
+        runBlocking { ChangeCategories.run("0", parameters) }
         assertEquals(
             "1,2",
             transaction {
@@ -125,7 +125,7 @@ internal class ProfileKtTest {
     fun `Categories changed when input is correct and have all categories`() {
         val parameters = TestParameters()
         parameters["new"] = "Test 1,Test 2,Test 3,Test 4"
-        runBlocking { ChangeCategories.execute("0", parameters) }
+        runBlocking { ChangeCategories.run("0", parameters) }
         assertEquals(
             "1,2,3,4",
             transaction {
@@ -141,7 +141,7 @@ internal class ProfileKtTest {
         val parameters = TestParameters()
         parameters["new"] = "Test 1,Bad cat"
         assertThrows(ElementWasNotFoundException::class.java) {
-            runBlocking { ChangeCategories.execute("0", parameters) }
+            runBlocking { ChangeCategories.run("0", parameters) }
         }
     }
 
@@ -150,7 +150,7 @@ internal class ProfileKtTest {
         val parameters = TestParameters()
         parameters["new"] = "Test 1,Bad mec"
         assertThrows(ElementWasNotFoundException::class.java) {
-            runBlocking { ChangeMechanics.execute("0", parameters) }
+            runBlocking { ChangeMechanics.run("0", parameters) }
         }
     }
 
@@ -159,7 +159,7 @@ internal class ProfileKtTest {
         val parameters = TestParameters()
         parameters["new"] = "Test 1,Duplicate cat,Duplicate cat"
         assertThrows(BadDataException::class.java) {
-            runBlocking { ChangeCategories.execute("0", parameters) }
+            runBlocking { ChangeCategories.run("0", parameters) }
         }
     }
 
@@ -168,14 +168,14 @@ internal class ProfileKtTest {
         val parameters = TestParameters()
         parameters["new"] = "Test 1,Duplicate mec,Duplicate mec"
         assertThrows(BadDataException::class.java) {
-            runBlocking { ChangeMechanics.execute("0", parameters) }
+            runBlocking { ChangeMechanics.run("0", parameters) }
         }
     }
 
     @Test
     fun `User not logged in when he logged out`() {
         val iat = Date.from(Instant.now())
-        runBlocking { LogOut.execute("0") }
+        runBlocking { LogOut.run("0") }
         assertFalse(runBlocking { isUserLoggedIn("0", iat) })
     }
 

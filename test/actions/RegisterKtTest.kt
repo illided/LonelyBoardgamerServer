@@ -36,7 +36,7 @@ internal class RegisterKtTest {
         myParams["prefCategories"] = "Test 1,Test 2"
         myParams["prefMechanics"] = "Test 3,Test 4"
 
-        runBlocking { AddUser.execute("0", myParams) }
+        runBlocking { AddUser.run("0", myParams) }
 
         assertTrue(runBlocking { isExist("0") })
     }
@@ -47,7 +47,7 @@ internal class RegisterKtTest {
         myParams["VKAccessToken"] = "token"
         myParams["address"] = "Moscow"
 
-        runBlocking { AddUser.execute("1", myParams) }
+        runBlocking { AddUser.run("1", myParams) }
 
         assertTrue(runBlocking {isExist("1") })
     }
@@ -58,7 +58,7 @@ internal class RegisterKtTest {
         myParams["VKAccessToken"] = "token"
 
         assertThrows(InfoMissingException::class.java) {
-            runBlocking { AddUser.execute("2", myParams) }
+            runBlocking { AddUser.run("2", myParams) }
         }
     }
 
@@ -70,7 +70,7 @@ internal class RegisterKtTest {
         myParams["prefCategories"] = "Test 6,Test 2"
 
         assertThrows(ElementWasNotFoundException::class.java) {
-            runBlocking { AddUser.execute("2", myParams) }
+            runBlocking { AddUser.run("2", myParams) }
         }
     }
 
@@ -82,7 +82,7 @@ internal class RegisterKtTest {
         myParams["prefMechanics"] = "Test 6,Test 2"
 
         assertThrows(ElementWasNotFoundException::class.java) {
-            runBlocking { AddUser.execute("2", myParams) }
+            runBlocking { AddUser.run("2", myParams) }
         }
     }
 
@@ -94,7 +94,7 @@ internal class RegisterKtTest {
         myParams["prefCategories"] = "Test 5,Test 5"
 
         assertThrows(BadDataException::class.java) {
-            runBlocking { AddUser.execute("2", myParams) }
+            runBlocking { AddUser.run("2", myParams) }
         }
     }
 
@@ -106,7 +106,7 @@ internal class RegisterKtTest {
         myParams["prefMechanics"] = "Test 5,Test 5"
 
         assertThrows(BadDataException::class.java) {
-            runBlocking { AddUser.execute("2", myParams) }
+            runBlocking { AddUser.run("2", myParams) }
         }
     }
 

@@ -22,7 +22,7 @@ fun Routing.registerRoute() {
         if (isExist(userId)) {
             throw AuthorizationException("This user already exist")
         }
-        AddUser.execute(userId, parameters)
+        AddUser.run(userId, parameters)
 
         call.respond(ServerResponse(0, JwtConfig.makeToken(userId)))
     }

@@ -23,7 +23,7 @@ internal class SearchKtTest {
     fun `Getting only people within small box when searching for nearest`() {
         assertEquals(
             3,
-            runBlocking { SearchNearest.execute("0", TestParameters()).size }
+            runBlocking { SearchNearest.run("0", TestParameters()).size }
         )
     }
 
@@ -33,7 +33,7 @@ internal class SearchKtTest {
         myParameters["offset"] = "1"
         assertEquals(
             2,
-            runBlocking { SearchNearest.execute("0", myParameters).size }
+            runBlocking { SearchNearest.run("0", myParameters).size }
         )
     }
 
@@ -43,7 +43,7 @@ internal class SearchKtTest {
         myParameters["limit"] = "2"
         assertEquals(
             2,
-            runBlocking { SearchNearest.execute("0", myParameters).size }
+            runBlocking { SearchNearest.run("0", myParameters).size }
         )
     }
 
@@ -53,7 +53,7 @@ internal class SearchKtTest {
         myParameters["limit"] = "100"
         assertEquals(
             3,
-            runBlocking { SearchNearest.execute("0", myParameters).size }
+            runBlocking { SearchNearest.run("0", myParameters).size }
         )
     }
 
@@ -63,7 +63,7 @@ internal class SearchKtTest {
         myParameters["limit"] = "0"
         assertEquals(
             0,
-            runBlocking { SearchNearest.execute("0", myParameters).size }
+            runBlocking { SearchNearest.run("0", myParameters).size }
         )
     }
 
@@ -72,7 +72,7 @@ internal class SearchKtTest {
         val myParameters = TestParameters()
         myParameters["limit"] = "-5"
         assertThrows(BadDataException::class.java) {
-            runBlocking { SearchNearest.execute("0", myParameters) }
+            runBlocking { SearchNearest.run("0", myParameters) }
         }
     }
 
@@ -82,7 +82,7 @@ internal class SearchKtTest {
         myParameters["offset"] = "100"
         assertEquals(
             0,
-            runBlocking { SearchNearest.execute("0", myParameters).size }
+            runBlocking { SearchNearest.run("0", myParameters).size }
         )
     }
 
@@ -92,7 +92,7 @@ internal class SearchKtTest {
         myParameters["offset"] = "0"
         assertEquals(
             3,
-            runBlocking { SearchNearest.execute("0", myParameters).size }
+            runBlocking { SearchNearest.run("0", myParameters).size }
         )
     }
 
@@ -101,7 +101,7 @@ internal class SearchKtTest {
         val myParameters = TestParameters()
         myParameters["offset"] = "-5"
         assertThrows(BadDataException::class.java) {
-            runBlocking { SearchNearest.execute("0", myParameters) }
+            runBlocking { SearchNearest.run("0", myParameters) }
         }
     }
 
@@ -109,7 +109,7 @@ internal class SearchKtTest {
     fun `Getting correct profile info when searching by id and user exist`() {
         assertEquals(
             "Ivan",
-            runBlocking { SearchPublicly.execute("1") }?.firstName
+            runBlocking { SearchPublicly.run("1") }?.firstName
         )
     }
 
@@ -117,7 +117,7 @@ internal class SearchKtTest {
     fun `Getting null when searching by id and user does not exist`() {
         assertEquals(
             null,
-            runBlocking { SearchPublicly.execute("100") }
+            runBlocking { SearchPublicly.run("100") }
         )
     }
 

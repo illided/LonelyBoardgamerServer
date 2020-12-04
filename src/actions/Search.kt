@@ -15,7 +15,7 @@ fun Route.searchActions() {
         get("") {
             call.respond(
                 try {
-                    ServerResponse(0, SearchNearest.execute(call.principal<Ticket>()?.id!!, call.parameters))
+                    ServerResponse(0, SearchNearest.run(call.principal<Ticket>()?.id!!, call.parameters))
                 } catch (exception: NumberFormatException) {
                     throw WrongDataFormatException("Limit or offset have wrong format")
                 }
@@ -25,7 +25,7 @@ fun Route.searchActions() {
         get("/byId") {
             call.respond(
                 ServerResponse(
-                    0, SearchPublicly.execute(call.principal<Ticket>()?.id!!)
+                    0, SearchPublicly.run(call.principal<Ticket>()?.id!!)
                         ?: throw ElementWasNotFoundException("No user with such id")
                 )
             )

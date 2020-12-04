@@ -2,9 +2,10 @@ package com.twoilya.lonelyboardgamer.actions.commands.search
 
 import actions.commands.TableCommand
 import com.twoilya.lonelyboardgamer.tables.*
+import io.ktor.http.*
 import org.jetbrains.exposed.sql.ResultRow
 
-object SearchPublicly : TableCommand() {
+object SearchPublicly : TableCommand<ProfileInfo?>() {
     private val mapper: (ResultRow) -> ProfileInfo? = { row ->
         ProfileInfo(
             id = row[UsersProfileInfo.id],
@@ -19,10 +20,11 @@ object SearchPublicly : TableCommand() {
         )
     }
 
-    suspend fun execute(userId: String) =
-        UsersProfileInfo.findInTable(
+    override fun query(userId: String, parameters: Parameters): ProfileInfo? {
+        return UsersProfileInfo.findInTable(
             userId,
             UsersProfileInfo.id,
             mapper
         )
+    }
 }

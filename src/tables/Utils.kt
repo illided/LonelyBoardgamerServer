@@ -13,11 +13,9 @@ suspend fun <T> dbQuery(block: () -> T): T =
         transaction { block() }
     }
 
-suspend fun <T> Table.findInTable(userId: String, idColumn: Column<String>, mapper: (ResultRow) -> T) : T? {
-    return dbQuery {
-        val searchResult = select { idColumn eq userId }
-            .limit(1)
-            .map { mapper(it) }
-        if (searchResult.size == 1) searchResult[0] else null
-    }
+fun <T> Table.findInTable(userId: String, idColumn: Column<String>, mapper: (ResultRow) -> T): T? {
+    val searchResult = select { idColumn eq userId }
+        .limit(1)
+        .map { mapper(it) }
+    return if (searchResult.size == 1) searchResult[0] else null
 }

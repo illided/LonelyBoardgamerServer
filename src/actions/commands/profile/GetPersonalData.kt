@@ -3,9 +3,10 @@ package com.twoilya.lonelyboardgamer.actions.commands.profile
 import actions.commands.TableCommand
 import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
 import com.twoilya.lonelyboardgamer.tables.*
+import io.ktor.http.*
 import org.jetbrains.exposed.sql.ResultRow
 
-object GetPersonalData : TableCommand() {
+object GetPersonalData : TableCommand<ProfileInfo>() {
     private val mapper: (ResultRow) -> ProfileInfo = { row ->
         ProfileInfo(
             id = row[UsersProfileInfo.id],
@@ -22,10 +23,11 @@ object GetPersonalData : TableCommand() {
         )
     }
 
-    suspend fun execute(userId: String) =
-        UsersProfileInfo.findInTable(
+    override fun query(userId: String, parameters: Parameters): ProfileInfo {
+        return UsersProfileInfo.findInTable(
             userId,
             UsersProfileInfo.id,
             mapper
         ) ?: throw ElementWasNotFoundException("No user with such id")
+    }
 }
