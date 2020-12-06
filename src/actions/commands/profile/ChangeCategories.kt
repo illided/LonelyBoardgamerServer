@@ -8,7 +8,9 @@ import io.ktor.http.Parameters
 import org.jetbrains.exposed.sql.update
 
 object ChangeCategories : TableCommand<Unit>() {
-    override fun query(userId: String, parameters: Parameters) {
+    override fun query(userId: Long?, parameters: Parameters) {
+        require(userId != null) {""}
+
         val new = parameters["new"]?.split(",")
             ?: throw InfoMissingException("No categories provided")
 

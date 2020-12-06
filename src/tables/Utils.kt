@@ -13,7 +13,7 @@ suspend fun <T> dbQuery(block: () -> T): T =
         transaction { block() }
     }
 
-fun <T> Table.findInTable(userId: String, idColumn: Column<String>, mapper: (ResultRow) -> T): T? {
+fun <T, E> Table.findInTable(userId: E, idColumn: Column<E>, mapper: (ResultRow) -> T): T? {
     val searchResult = select { idColumn eq userId }
         .limit(1)
         .map { mapper(it) }

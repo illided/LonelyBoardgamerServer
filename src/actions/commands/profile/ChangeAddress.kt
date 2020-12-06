@@ -9,7 +9,9 @@ import io.ktor.http.Parameters
 import org.jetbrains.exposed.sql.update
 
 object ChangeAddress : TableCommand<Unit>() {
-    override fun query(userId: String, parameters: Parameters) {
+    override fun query(userId: Long?, parameters: Parameters) {
+        require(userId != null) { "Change address is user specific but no user id provided" }
+
         val new = parameters["new"] ?: throw InfoMissingException(
             "No address provided"
         )

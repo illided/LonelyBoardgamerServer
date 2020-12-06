@@ -9,10 +9,10 @@ import org.joda.time.DateTime
 import java.util.*
 
 object UsersLoginInfo : Table() {
-    val id: Column<String> = varchar("id", 10)
+    val id: Column<Long> = reference("id", UsersProfileInfo.id)
     val lastLogout: Column<DateTime> = datetime("lastLogout")
 
     override val primaryKey = PrimaryKey(id)
 }
 
-data class Credentials(val id: String, val lastLogout: DateTime)
+data class Credentials(val id: Long, val lastLogout: DateTime)

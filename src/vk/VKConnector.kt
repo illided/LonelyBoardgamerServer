@@ -45,11 +45,11 @@ object VKConnector {
         }
     }
 
-    fun getName(userId: String): Pair<String, String> {
+    fun getName(vkId: String): Pair<String, String> {
         val response =
             runBlocking {
                 connectAndGet<UsersGetResponse>(
-                    url = "$USERS_GET?user_ids=$userId&$IN_RUSSIAN&$SERVER_TOKEN&$VK_API_VERSION",
+                    url = "$USERS_GET?user_ids=$vkId&$IN_RUSSIAN&$SERVER_TOKEN&$VK_API_VERSION",
                     exception = AuthorizationException("Server token is invalid or such id does not exist")
                 )
             }

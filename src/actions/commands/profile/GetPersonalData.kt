@@ -6,11 +6,9 @@ import com.twoilya.lonelyboardgamer.tables.*
 import io.ktor.http.*
 import org.jetbrains.exposed.sql.ResultRow
 
-object GetPersonalData : TableCommand<ProfileInfo>() {
-    private val mapper: (ResultRow) -> ProfileInfo = { row ->
-        ProfileInfo(
-            id = row[UsersProfileInfo.id],
-
+object GetPersonalData : TableCommand<PersonalProfileInfo>() {
+    private val mapper: (ResultRow) -> PersonalProfileInfo = { row ->
+        PersonalProfileInfo(
             firstName = row[UsersProfileInfo.firstName],
             secondName = row[UsersProfileInfo.secondName],
 
@@ -23,7 +21,10 @@ object GetPersonalData : TableCommand<ProfileInfo>() {
         )
     }
 
-    override fun query(userId: String, parameters: Parameters): ProfileInfo {
+    override fun query(userId: Long?, parameters: Parameters): PersonalProfileInfo {
+        require(userId != null)
+        { "Get personal data is user specific but no user id provided" }
+
         return UsersProfileInfo.findInTable(
             userId,
             UsersProfileInfo.id,
