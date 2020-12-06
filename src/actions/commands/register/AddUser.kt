@@ -1,31 +1,39 @@
 package com.twoilya.lonelyboardgamer.actions.commands.register
 
 import actions.commands.TableCommand
+import com.twoilya.lonelyboardgamer.AuthorizationException
 import com.twoilya.lonelyboardgamer.InfoMissingException
+import com.twoilya.lonelyboardgamer.auth.getIdQuery
+import com.twoilya.lonelyboardgamer.auth.isExistWithSuchVKid
 import com.twoilya.lonelyboardgamer.geo.Geocoder
 import com.twoilya.lonelyboardgamer.tables.*
 import com.twoilya.lonelyboardgamer.vk.VKConnector
 import io.ktor.http.Parameters
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
+import java.lang.IllegalArgumentException
 
-object AddUser : TableCommand() {
-    suspend fun execute(userId: String, parameters: Parameters) = dbQuery<Unit> {
-        val userAddress = parameters["address"] ?: throw InfoMissingException("No address provided")
-        val (vkFirstName, vkSecondName) = VKConnector.getName(userId)
+object AddUser : TableCommand<Long>() {
+    override fun query(userId: Long?, parameters: Parameters) : Long {
+        val userAddress = parameters["address"]
+            ?: throw InfoMissingException("No address provided")
         val (lat, lng) = Geocoder.getCoordinates(userAddress)
 
-        UsersLoginInfo.insert {
-            it[id] = userId
-            it[lastLogout] = DateTime(System.currentTimeMillis()).secondOfDay().roundFloorCopy()
-        }
-        UsersProfileInfo.insert {
-            it[id] = userId
+        val vkAccessToken = parameters["VKAccessToken"]
+            ?: throw InfoMissingException("No token provided")
 
+        val vkId = VKConnector.checkToken(vkAccessToken)
+        if (runBlocking { isExistWithSuchVKid(vkId) }) {
+            throw AuthorizationException("Such user already exist")
+        }
+        val (vkFirstName, vkSecondName) = VKConnector.getName(vkId)
+
+        UsersProfileInfo.insert {
             it[firstName] = vkFirstName
             it[secondName] = vkSecondName
+
+            it[VKid] = vkId
 
             it[address] = userAddress
 
@@ -39,11 +47,20 @@ object AddUser : TableCommand() {
                 parameters["prefMechanics"]?.split(",")
             ).joinToString(",")
         }
-        UsersLocations.insert {
-            it[id] = userId
 
+        val newUserId = getIdQuery(vkId)
+            ?: throw IllegalArgumentException("User was not added when it should have been")
+
+        UsersLoginInfo.insert {
+            it[id] = newUserId
+            it[lastLogout] = DateTime(System.currentTimeMillis()).secondOfDay().roundFloorCopy()
+        }
+        UsersLocations.insert {
+            it[id] = newUserId
             it[latitude] = lat.toDouble()
             it[longitude] = lng.toDouble()
         }
+
+        return newUserId
     }
 }

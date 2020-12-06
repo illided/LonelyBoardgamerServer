@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.*
 import java.io.IOException
 
 object UsersLocations : Table() {
-    val id: Column<String> = reference("id", UsersProfileInfo.id)
+    val id: Column<Long> = reference("id", UsersProfileInfo.id)
     val latitude: Column<Double> = double("lat")
     val longitude: Column<Double> = double("lng")
 

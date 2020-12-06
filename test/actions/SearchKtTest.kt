@@ -23,7 +23,7 @@ internal class SearchKtTest {
     fun `Getting only people within small box when searching for nearest`() {
         assertEquals(
             3,
-            runBlocking { SearchNearest.execute("0", TestParameters()).size }
+            runBlocking { SearchNearest.run(1, TestParameters()).size }
         )
     }
 
@@ -33,7 +33,7 @@ internal class SearchKtTest {
         myParameters["offset"] = "1"
         assertEquals(
             2,
-            runBlocking { SearchNearest.execute("0", myParameters).size }
+            runBlocking { SearchNearest.run(1, myParameters).size }
         )
     }
 
@@ -43,7 +43,7 @@ internal class SearchKtTest {
         myParameters["limit"] = "2"
         assertEquals(
             2,
-            runBlocking { SearchNearest.execute("0", myParameters).size }
+            runBlocking { SearchNearest.run(1, myParameters).size }
         )
     }
 
@@ -53,7 +53,7 @@ internal class SearchKtTest {
         myParameters["limit"] = "100"
         assertEquals(
             3,
-            runBlocking { SearchNearest.execute("0", myParameters).size }
+            runBlocking { SearchNearest.run(1, myParameters).size }
         )
     }
 
@@ -63,7 +63,7 @@ internal class SearchKtTest {
         myParameters["limit"] = "0"
         assertEquals(
             0,
-            runBlocking { SearchNearest.execute("0", myParameters).size }
+            runBlocking { SearchNearest.run(1, myParameters).size }
         )
     }
 
@@ -72,7 +72,7 @@ internal class SearchKtTest {
         val myParameters = TestParameters()
         myParameters["limit"] = "-5"
         assertThrows(BadDataException::class.java) {
-            runBlocking { SearchNearest.execute("0", myParameters) }
+            runBlocking { SearchNearest.run(1, myParameters) }
         }
     }
 
@@ -82,7 +82,7 @@ internal class SearchKtTest {
         myParameters["offset"] = "100"
         assertEquals(
             0,
-            runBlocking { SearchNearest.execute("0", myParameters).size }
+            runBlocking { SearchNearest.run(1, myParameters).size }
         )
     }
 
@@ -92,7 +92,7 @@ internal class SearchKtTest {
         myParameters["offset"] = "0"
         assertEquals(
             3,
-            runBlocking { SearchNearest.execute("0", myParameters).size }
+            runBlocking { SearchNearest.run(1, myParameters).size }
         )
     }
 
@@ -101,23 +101,27 @@ internal class SearchKtTest {
         val myParameters = TestParameters()
         myParameters["offset"] = "-5"
         assertThrows(BadDataException::class.java) {
-            runBlocking { SearchNearest.execute("0", myParameters) }
+            runBlocking { SearchNearest.run(1, myParameters) }
         }
     }
 
     @Test
     fun `Getting correct profile info when searching by id and user exist`() {
+        val testParameters = TestParameters()
+        testParameters["id"] = "2"
         assertEquals(
             "Ivan",
-            runBlocking { SearchPublicly.execute("1") }?.firstName
+            runBlocking { SearchPublicly.run(1, testParameters) }?.firstName
         )
     }
 
     @Test
     fun `Getting null when searching by id and user does not exist`() {
+        val testParameters = TestParameters()
+        testParameters["id"] = "100"
         assertEquals(
             null,
-            runBlocking { SearchPublicly.execute("100") }
+            runBlocking { SearchPublicly.run(1, testParameters) }
         )
     }
 
@@ -139,19 +143,19 @@ internal class SearchKtTest {
             )
 
             val userInfoEntries = listOf(
-                "0" to listOf("John", "Wick", "I love my dog", "Great Britain", "1,2", "2,3"),
-                "1" to listOf("Ivan", "Ivanov", "So lonely...", "Ural", "2,3", "4,5"),
-                "2" to listOf("Svetlana", "Svetova", "Lets play munchkin", "Moscow", "1,3", "2,5"),
-                "3" to listOf("Michael", "Michailov", "I love monopoly", "Ekaterinburg", "1", "5"),
-                "4" to listOf("Anton", "Anton Antonov", "I wish i had party for gloomhaven", "Peterburg", "2", "3")
+                "1" to listOf("John", "Wick", "I love my dog", "Great Britain", "1,2", "2,3"),
+                "2" to listOf("Ivan", "Ivanov", "So lonely...", "Ural", "2,3", "4,5"),
+                "3" to listOf("Svetlana", "Svetova", "Lets play munchkin", "Moscow", "1,3", "2,5"),
+                "4" to listOf("Michael", "Michailov", "I love monopoly", "Ekaterinburg", "1", "5"),
+                "5" to listOf("Anton", "Anton Antonov", "I wish i had party for gloomhaven", "Peterburg", "2", "3")
             )
 
             val locationsEntries = listOf(
-                "0" to listOf(50.0, 50.0),
-                "1" to listOf(50.01, 50.01),
-                "2" to listOf(50.02, 50.02),
-                "3" to listOf(50.03, 50.03),
-                "4" to listOf(70.0, 70.0)
+                "1" to listOf(50.0, 50.0),
+                "2" to listOf(50.01, 50.01),
+                "3" to listOf(50.02, 50.02),
+                "4" to listOf(50.03, 50.03),
+                "5" to listOf(70.0, 70.0)
             )
 
 
@@ -170,7 +174,7 @@ internal class SearchKtTest {
                     val id = entry.first
                     val parameters = entry.second
 
-                    this[UsersProfileInfo.id] = id
+                    this[UsersProfileInfo.VKid] = id
                     this[UsersProfileInfo.firstName] = parameters[0]
                     this[UsersProfileInfo.secondName] = parameters[1]
                     this[UsersProfileInfo.description] = parameters[2]
@@ -185,7 +189,7 @@ internal class SearchKtTest {
                     val id = entry.first
                     val coordinates = entry.second
 
-                    this[UsersLocations.id] = id
+                    this[UsersLocations.id] = id.toLong()
                     this[UsersLocations.latitude] = coordinates[0]
                     this[UsersLocations.longitude] = coordinates[1]
                 }

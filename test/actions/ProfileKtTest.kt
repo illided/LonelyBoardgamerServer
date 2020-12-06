@@ -5,7 +5,7 @@ import com.twoilya.lonelyboardgamer.BadDataException
 import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
 import com.twoilya.lonelyboardgamer.WrongDataFormatException
 import com.twoilya.lonelyboardgamer.actions.commands.profile.*
-import com.twoilya.lonelyboardgamer.auth.LoggedInService
+import com.twoilya.lonelyboardgamer.auth.isUserLoggedIn
 import com.twoilya.lonelyboardgamer.geo.Geocoder
 import com.twoilya.lonelyboardgamer.tables.*
 import io.mockk.every
@@ -32,9 +32,8 @@ internal class ProfileKtTest {
     @Test
     @Order(1)
     fun `Profile data received when user exists`() {
-        val gotFromDB = runBlocking { GetPersonalData.execute("0") }
-        val expected = ProfileInfo(
-            id = "0",
+        val gotFromDB = runBlocking { GetPersonalData.run(1) }
+        val expected = PersonalProfileInfo(
             firstName = "John",
             secondName = "Wick",
             description = "I love my dog",
@@ -53,12 +52,12 @@ internal class ProfileKtTest {
         mockkObject(Geocoder)
         every { Geocoder.getCoordinates("Russia") } returns ("70.0" to "70.0")
 
-        runBlocking { ChangeAddress.execute("0", parameters) }
+        runBlocking { ChangeAddress.run(1, parameters) }
         assertEquals(
             "70.0,70.0",
             transaction {
                 UsersLocations
-                    .select { UsersLocations.id eq "0" }
+                    .select { UsersLocations.id eq 1 }
                     .map { "${it[UsersLocations.latitude]},${it[UsersLocations.longitude]}" }
             }.component1()
         )
@@ -69,7 +68,7 @@ internal class ProfileKtTest {
     @Test
     fun `Exception thrown when tries to get data about non existing user`() {
         assertThrows(ElementWasNotFoundException::class.java) {
-            runBlocking { GetPersonalData.execute("1") }
+            runBlocking { GetPersonalData.run(10) }
         }
     }
 
@@ -77,12 +76,12 @@ internal class ProfileKtTest {
     fun `Description changed when user exists and params correct`() {
         val params = TestParameters()
         params["new"] = "They took my car"
-        runBlocking { ChangeDescription.execute("0", params) }
+        runBlocking { ChangeDescription.run(1, params) }
         assertEquals(
             "They took my car",
             transaction {
                 UsersProfileInfo
-                    .select { UsersProfileInfo.id eq "0" }
+                    .select { UsersProfileInfo.id eq 1 }
                     .map { it[UsersProfileInfo.description].toString() }
             }.component1()
         )
@@ -102,7 +101,7 @@ internal class ProfileKtTest {
                 " evidence of that horror—that thing on the doorstep."
 
         assertThrows(WrongDataFormatException::class.java) {
-            runBlocking { ChangeDescription.execute("0", params) }
+            runBlocking { ChangeDescription.run(1, params) }
         }
     }
 
@@ -110,12 +109,12 @@ internal class ProfileKtTest {
     fun `Categories changed when input is correct`() {
         val parameters = TestParameters()
         parameters["new"] = "Test 1,Test 2"
-        runBlocking { ChangeCategories.execute("0", parameters) }
+        runBlocking { ChangeCategories.run(1, parameters) }
         assertEquals(
             "1,2",
             transaction {
                 UsersProfileInfo
-                    .select { UsersProfileInfo.id eq "0" }
+                    .select { UsersProfileInfo.id eq 1 }
                     .map { it[UsersProfileInfo.prefCategories].toString() }
             }.component1()
         )
@@ -125,12 +124,12 @@ internal class ProfileKtTest {
     fun `Categories changed when input is correct and have all categories`() {
         val parameters = TestParameters()
         parameters["new"] = "Test 1,Test 2,Test 3,Test 4"
-        runBlocking { ChangeCategories.execute("0", parameters) }
+        runBlocking { ChangeCategories.run(1, parameters) }
         assertEquals(
             "1,2,3,4",
             transaction {
                 UsersProfileInfo
-                    .select { UsersProfileInfo.id eq "0" }
+                    .select { UsersProfileInfo.id eq 1 }
                     .map { it[UsersProfileInfo.prefCategories].toString() }
             }.component1()
         )
@@ -141,7 +140,7 @@ internal class ProfileKtTest {
         val parameters = TestParameters()
         parameters["new"] = "Test 1,Bad cat"
         assertThrows(ElementWasNotFoundException::class.java) {
-            runBlocking { ChangeCategories.execute("0", parameters) }
+            runBlocking { ChangeCategories.run(1, parameters) }
         }
     }
 
@@ -150,7 +149,7 @@ internal class ProfileKtTest {
         val parameters = TestParameters()
         parameters["new"] = "Test 1,Bad mec"
         assertThrows(ElementWasNotFoundException::class.java) {
-            runBlocking { ChangeMechanics.execute("0", parameters) }
+            runBlocking { ChangeMechanics.run(1, parameters) }
         }
     }
 
@@ -159,7 +158,7 @@ internal class ProfileKtTest {
         val parameters = TestParameters()
         parameters["new"] = "Test 1,Duplicate cat,Duplicate cat"
         assertThrows(BadDataException::class.java) {
-            runBlocking { ChangeCategories.execute("0", parameters) }
+            runBlocking { ChangeCategories.run(1, parameters) }
         }
     }
 
@@ -168,15 +167,15 @@ internal class ProfileKtTest {
         val parameters = TestParameters()
         parameters["new"] = "Test 1,Duplicate mec,Duplicate mec"
         assertThrows(BadDataException::class.java) {
-            runBlocking { ChangeMechanics.execute("0", parameters) }
+            runBlocking { ChangeMechanics.run(1, parameters) }
         }
     }
 
     @Test
     fun `User not logged in when he logged out`() {
         val iat = Date.from(Instant.now())
-        runBlocking { LogOut.execute("0") }
-        assertFalse(runBlocking { LoggedInService.isUserLoggedIn("0", iat) })
+        runBlocking { LogOut.run(1) }
+        assertFalse(runBlocking { isUserLoggedIn(1, iat) })
     }
 
     companion object {
@@ -204,20 +203,20 @@ internal class ProfileKtTest {
                     UsersLocations
                 )
                 UsersProfileInfo.insert {
-                    it[id] = "0"
                     it[firstName] = "John"
                     it[secondName] = "Wick"
+                    it[VKid] = "0"
                     it[description] = "I love my dog"
                     it[address] = "Great Britain"
                     it[prefMechanics] = ""
                     it[prefCategories] = ""
                 }
                 UsersLoginInfo.insert {
-                    it[id] = "0"
+                    it[id] = 1
                     it[lastLogout] = DateTime(System.currentTimeMillis())
                 }
                 UsersLocations.insert {
-                    it[id] = "0"
+                    it[id] = 1
                     it[latitude] = 50.0
                     it[longitude] = 50.0
                 }
