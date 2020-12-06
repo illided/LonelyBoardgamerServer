@@ -10,6 +10,7 @@ import io.ktor.application.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Routing.loginRoute() {
     post("/login") {
@@ -20,7 +21,7 @@ fun Routing.loginRoute() {
 
         val vkId = VKConnector.checkToken(vkAccessToken)
 
-        val userId = getIdQuery(vkId)
+        val userId = transaction { getIdQuery(vkId) }
             ?: throw ElementWasNotFoundException("This user does not exist")
 
         call.respond(ServerResponse(0, JwtConfig.makeToken(userId)))

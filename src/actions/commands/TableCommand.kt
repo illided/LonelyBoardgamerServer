@@ -1,7 +1,6 @@
 package actions.commands
 
 import com.twoilya.lonelyboardgamer.WithCodeException
-import com.twoilya.lonelyboardgamer.tables.dbQuery
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
