@@ -1,6 +1,7 @@
 package actions.commands
 
 import com.twoilya.lonelyboardgamer.WithCodeException
+import com.twoilya.lonelyboardgamer.tables.dbQuery
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -9,10 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 abstract class TableCommand<T> {
     suspend fun run(userId: Long? = null, parameters: Parameters = Parameters.Empty): T {
         return try {
-            withContext(Dispatchers.IO) {
-                transaction { query(userId, parameters) }
-            }
-            /*dbQuery { query(userId, parameters) }*/
+            dbQuery { query(userId, parameters) }
         } catch (exception: Exception) {
             if (exception !is WithCodeException) {
                 writeLog(parameters)

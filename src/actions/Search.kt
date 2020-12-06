@@ -25,7 +25,7 @@ fun Route.searchActions() {
         get("/byId") {
             call.respond(
                 ServerResponse(
-                    0, SearchPublicly.run(call.principal<Ticket>()?.id!!)
+                    0, SearchPublicly.run(call.principal<Ticket>()?.id!!, call.parameters)
                         ?: throw ElementWasNotFoundException("No user with such id")
                 )
             )

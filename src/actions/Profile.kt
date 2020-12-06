@@ -5,6 +5,7 @@ import com.twoilya.lonelyboardgamer.Ticket
 import com.twoilya.lonelyboardgamer.actions.commands.profile.*
 import io.ktor.application.call
 import io.ktor.auth.principal
+import io.ktor.request.*
 import io.ktor.response.respond
 import io.ktor.routing.*
 
@@ -25,7 +26,7 @@ fun Route.profileActions() {
             post("/description") {
                 ChangeDescription.run(
                     call.principal<Ticket>()?.id!!,
-                    call.parameters
+                    call.receiveParameters()
                 )
                 call.respond(ServerResponse(0, "Description changed"))
             }
@@ -33,7 +34,7 @@ fun Route.profileActions() {
             post("/prefCategories") {
                 ChangeCategories.run(
                     call.principal<Ticket>()?.id!!,
-                    call.parameters
+                    call.receiveParameters()
                 )
                 call.respond(ServerResponse(0, "Preferable categories changed"))
             }
@@ -41,7 +42,7 @@ fun Route.profileActions() {
             post("/prefMechanics") {
                 ChangeMechanics.run(
                     call.principal<Ticket>()?.id!!,
-                    call.parameters
+                    call.receiveParameters()
                 )
                 call.respond(ServerResponse(0, "Preferable mechanics changed"))
             }
@@ -49,7 +50,7 @@ fun Route.profileActions() {
             post("/address") {
                 ChangeAddress.run(
                     call.principal<Ticket>()?.id!!,
-                    call.parameters
+                    call.receiveParameters()
                 )
                 call.respond(ServerResponse(0, "Address changed"))
             }
