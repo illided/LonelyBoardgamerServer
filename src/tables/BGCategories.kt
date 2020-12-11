@@ -23,7 +23,7 @@ object BGCategories : Table() {
     }
 
     fun findByName(names: List<String>?): List<String> {
-        if (names == null) {
+        if (names == null || names == listOf("")) {
             return emptyList()
         }
 
