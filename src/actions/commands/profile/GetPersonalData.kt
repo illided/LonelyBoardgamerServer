@@ -2,17 +2,13 @@ package com.twoilya.lonelyboardgamer.actions.commands.profile
 
 import actions.commands.TableCommand
 import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
-import com.twoilya.lonelyboardgamer.tables.BGCategories
-import com.twoilya.lonelyboardgamer.tables.BGMechanics
-import com.twoilya.lonelyboardgamer.tables.ProfileInfo
-import com.twoilya.lonelyboardgamer.tables.UsersProfileInfo
+import com.twoilya.lonelyboardgamer.tables.*
+import io.ktor.http.*
 import org.jetbrains.exposed.sql.ResultRow
 
-object GetPersonalData : TableCommand() {
-    private val mapper: (ResultRow) -> ProfileInfo = { row ->
-        ProfileInfo(
-            id = row[UsersProfileInfo.id],
-
+object GetPersonalData : TableCommand<PersonalProfileInfo>() {
+    private val mapper: (ResultRow) -> PersonalProfileInfo = { row ->
+        PersonalProfileInfo(
             firstName = row[UsersProfileInfo.firstName],
             secondName = row[UsersProfileInfo.secondName],
 
@@ -25,10 +21,14 @@ object GetPersonalData : TableCommand() {
         )
     }
 
-    suspend fun execute(userId: String) =
-        UsersProfileInfo.findInTable(
+    override fun query(userId: Long?, parameters: Parameters): PersonalProfileInfo {
+        require(userId != null)
+        { "Get personal data is user specific but no user id provided" }
+
+        return UsersProfileInfo.findInTable(
             userId,
             UsersProfileInfo.id,
             mapper
         ) ?: throw ElementWasNotFoundException("No user with such id")
+    }
 }

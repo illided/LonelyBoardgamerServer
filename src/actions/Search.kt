@@ -10,27 +10,25 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
 
-fun searchActions(route: Route) {
-    route {
-        route("/search") {
-            get("") {
-                call.respond(
-                    try {
-                        ServerResponse(0, SearchNearest.execute(call.principal<Ticket>()?.id!!, call.parameters))
-                    } catch (exception: NumberFormatException) {
-                        throw WrongDataFormatException("Limit or offset have wrong format")
-                    }
-                )
-            }
+fun Route.searchActions() {
+    route("/search") {
+        get("") {
+            call.respond(
+                try {
+                    ServerResponse(0, SearchNearest.run(call.principal<Ticket>()?.id!!, call.parameters))
+                } catch (exception: NumberFormatException) {
+                    throw WrongDataFormatException("Limit or offset have wrong format")
+                }
+            )
+        }
 
-            get("/byId") {
-                call.respond(
-                    ServerResponse(
-                        0, SearchPublicly.execute(call.principal<Ticket>()?.id!!)
-                            ?: throw ElementWasNotFoundException("No user with such id")
-                    )
+        get("/byId") {
+            call.respond(
+                ServerResponse(
+                    0, SearchPublicly.run(call.principal<Ticket>()?.id!!, call.parameters)
+                        ?: throw ElementWasNotFoundException("No user with such id")
                 )
-            }
+            )
         }
     }
 }

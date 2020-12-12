@@ -1,5 +1,6 @@
 package com.twoilya.lonelyboardgamer.tables
 
+import com.twoilya.lonelyboardgamer.BadDataException
 import com.twoilya.lonelyboardgamer.ElementWasNotFoundException
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
@@ -10,7 +11,7 @@ object BGMechanics : Table() {
     val id: Column<String> = varchar("id", 3)
     val name: Column<String> = varchar("name", 50)
 
-    override val primaryKey = PrimaryKey(id, name)
+    override val primaryKey = PrimaryKey(name)
 
     fun findById(ids: List<String>?): List<String> {
         if (ids == null) {
@@ -22,9 +23,12 @@ object BGMechanics : Table() {
     }
 
     fun findByName(names: List<String>?): List<String> {
-        if (names == null) {
+        if (names == null || names == listOf("")) {
             return emptyList()
         }
+
+        if (names.toSet().size != names.size)
+            throw BadDataException("Duplicate of mechanics presented")
 
         return transaction {
             BGMechanics.select { name inList names }.map { it[BGMechanics.id] }

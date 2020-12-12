@@ -16,15 +16,15 @@ object JwtConfig {
         .require(algorithm)
         .build()
 
-    fun makeToken(userId: String): String = JWT.create()
+    fun makeToken(userId: Long): String = JWT.create()
         .withClaim("id", userId)
         .withIssuedAt(Date.from(Instant.now()))
         .sign(algorithm)
 
     suspend fun verifyAndGetPrincipal(jwtCredential: JWTCredential) : Ticket? {
-        val id = jwtCredential.payload.claims["id"]?.asString() ?: return null
+        val id = jwtCredential.payload.claims["id"]?.asLong() ?: return null
         val iat = jwtCredential.payload.claims["iat"]?.asDate() ?: return null
-        return if (LoggedInService.isUserLoggedIn(id, iat)) {
+        return if (isUserLoggedIn(id, iat)) {
             Ticket(id)
         } else {
             null

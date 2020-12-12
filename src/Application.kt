@@ -35,7 +35,9 @@ fun Application.module(testing: Boolean = false) {
     val port = dotenv["PORT"]?.toInt() ?: 23567
 
     embeddedServer(Netty, port) {
-        DatabaseConnector.init()
+        if (!testing) {
+            DatabaseConnector.init()
+        }
 
         install(ContentNegotiation) {
             jackson {
@@ -65,11 +67,11 @@ fun Application.module(testing: Boolean = false) {
         }
 
         install(Routing) {
-            loginRoute(this)
-            registerRoute(this)
+            loginRoute()
+            registerRoute()
             authenticate {
-                profileActions(this)
-                searchActions(this)
+                profileActions()
+                searchActions()
             }
         }
     }.start(wait = true)

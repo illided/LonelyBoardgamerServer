@@ -9,6 +9,7 @@ import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.get
 import io.ktor.client.request.url
+import kotlinx.coroutines.runBlocking
 
 object VKConnector {
     private const val CHECK_TOKEN = "https://api.vk.com/method/secure.checkToken/"
@@ -31,23 +32,27 @@ object VKConnector {
         }
     }
 
-    suspend fun checkToken(token: String): String {
+    fun checkToken(token: String): String {
         if (!token.matches(regexForToken)) {
             throw WrongDataFormatException("Invalid access token format")
         }
 
-        return connectAndGet<CheckTokenResponse>(
-            url = "$CHECK_TOKEN?token=$token&$SERVER_TOKEN&$VK_API_VERSION",
-            exception = AuthorizationException("Invalid access token")
-        ).response.user_id
+        return runBlocking {
+            connectAndGet<CheckTokenResponse>(
+                url = "$CHECK_TOKEN?token=$token&$SERVER_TOKEN&$VK_API_VERSION",
+                exception = AuthorizationException("Invalid access token")
+            ).response.user_id
+        }
     }
 
-    suspend fun getName(userId: String): Pair<String, String> {
+    fun getName(vkId: String): Pair<String, String> {
         val response =
-            connectAndGet<UsersGetResponse>(
-                url = "$USERS_GET?user_ids=$userId&$IN_RUSSIAN&$SERVER_TOKEN&$VK_API_VERSION",
-                exception = AuthorizationException("Server token is invalid or such id does not exist")
-            )
+            runBlocking {
+                connectAndGet<UsersGetResponse>(
+                    url = "$USERS_GET?user_ids=$vkId&$IN_RUSSIAN&$SERVER_TOKEN&$VK_API_VERSION",
+                    exception = AuthorizationException("Server token is invalid or such id does not exist")
+                )
+            }
 
         require(response.response.size == 1) { "No user with such id" }
         val user = response.response.component1()
