@@ -24,7 +24,11 @@ fun Route.friendsActions() {
         }
 
         post("/delete") {
-
+            DeleteFromFriends.run(
+                call.principal<Ticket>()?.id,
+                call.receiveParameters()
+            )
+            call.respond(ServerResponse(0, "User deleted from friends"))
         }
 
         route("/requests") {
