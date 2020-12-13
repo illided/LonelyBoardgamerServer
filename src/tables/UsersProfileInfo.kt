@@ -43,5 +43,11 @@ data class RelativeProfileInfo(
     val prefCategories: List<String>,
     val prefMechanics: List<String>,
     val description: String,
-    //val friendStatus: someEnum
+    /*val friendStatus: FriendStatus*/
+)
+
+data class ShortProfileInfo(
+    val id: Long,
+    val firstName: String,
+    val secondName: String,
 )

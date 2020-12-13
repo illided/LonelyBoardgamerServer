@@ -3,20 +3,28 @@ package com.twoilya.lonelyboardgamer.tables
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.github.cdimascio.dotenv.dotenv
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils.create
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.postgresql.util.PSQLException
 
 object DatabaseConnector {
     fun init() {
         Database.connect(hikari())
         transaction {
+            exec("DO $$ BEGIN " +
+                            "CREATE TYPE FriendStatus AS ENUM ('Pending', 'Hidden', 'Friends'); " +
+                       "EXCEPTION " +
+                            "WHEN duplicate_object THEN null; " +
+                       "END $$;")
             create(
                 UsersLoginInfo,
                 UsersProfileInfo,
                 BGCategories,
                 BGMechanics,
-                UsersLocations
+                UsersLocations,
+                UsersRelations
             )
         }
     }
@@ -25,7 +33,7 @@ object DatabaseConnector {
         val dotenv = dotenv {
             ignoreIfMissing = true
         }
-        val config = HikariConfig().apply{
+        val config = HikariConfig().apply {
             driverClassName = "org.postgresql.Driver"
             jdbcUrl = dotenv["JDBC_DATABASE_URL"]
             username = dotenv["JDBC_DATABASE_USERNAME"]

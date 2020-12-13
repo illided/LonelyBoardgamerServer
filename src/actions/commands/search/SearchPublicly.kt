@@ -17,9 +17,13 @@ object SearchPublicly : TableCommand<RelativeProfileInfo?>() {
             description = row[UsersProfileInfo.description] ?: "",
 
             prefCategories = BGCategories.findById(row[UsersProfileInfo.prefCategories]?.split(",")),
-            prefMechanics = BGMechanics.findById(row[UsersProfileInfo.prefMechanics]?.split(","))
+            prefMechanics = BGMechanics.findById(row[UsersProfileInfo.prefMechanics]?.split(",")),
         )
     }
+
+    /*private fun getFriendStatusQuery(userId: Long): FriendStatus {
+
+    }*/
 
     override fun query(userId: Long?, parameters: Parameters): RelativeProfileInfo? {
         require(userId != null)
