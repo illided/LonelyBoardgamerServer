@@ -1,7 +1,7 @@
 package com.twoilya.lonelyboardgamer.tables
 
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.or
 
 object UsersRelations : Table() {
     val first = reference("person1", UsersProfileInfo.id)
@@ -11,7 +11,7 @@ object UsersRelations : Table() {
         "friendStatus",
         { value -> FriendStatus.valueOf(value as String) },
         { PGEnum("FriendStatus", it) })
-    val actionUser = reference("actionUser", UsersProfileInfo.id)
+    val actionUser = reference("actionUser", UsersProfileInfo.id).check {(it eq first) or (it eq second)}
 
     override val primaryKey: PrimaryKey = PrimaryKey(first, second)
 }

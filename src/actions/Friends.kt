@@ -11,29 +11,63 @@ import io.ktor.routing.*
 fun Route.friendsActions() {
     route("/friends") {
         get("") {
-            val user = call.principal<Ticket>()?.id!!
             call.respond(
                 ServerResponse(
                     0,
-                    GetFriendList.run(user, call.parameters)
+                    GetFriendList.run(
+                        call.principal<Ticket>()?.id,
+                        call.parameters
+                    )
                 )
             )
         }
+
         route("/requests") {
             get("/toMe") {
-
+                call.respond(
+                    ServerResponse(
+                        0,
+                        GetToMeRequests.run(
+                            call.principal<Ticket>()?.id,
+                            call.parameters
+                        )
+                    )
+                )
             }
+
             get("/fromMe") {
-
+                call.respond(
+                    ServerResponse(
+                        0,
+                        GetFromMeRequests.run(
+                            call.principal<Ticket>()?.id,
+                            call.parameters
+                        )
+                    )
+                )
             }
+
             get("/hidden") {
-
+                call.respond(
+                    ServerResponse(
+                        0,
+                        GetHiddenRequests.run(
+                            call.principal<Ticket>()?.id,
+                            call.parameters
+                        )
+                    )
+                )
             }
+
             post("/answer") {
 
             }
             post("/send") {
-
+                SendRequest.run(
+                    call.principal<Ticket>()?.id,
+                    call.parameters
+                )
+                call.respond(ServerResponse(0,"Request sent"))
             }
             post("/withdraw") {
 
