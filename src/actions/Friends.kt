@@ -60,14 +60,22 @@ fun Route.friendsActions() {
             }
 
             post("/answer") {
-
+                call.respond(
+                    ServerResponse(
+                        0, AnswerRequest.run(
+                            call.principal<Ticket>()?.id,
+                            call.parameters
+                        )
+                    )
+                )
             }
+
             post("/send") {
                 SendRequest.run(
                     call.principal<Ticket>()?.id,
                     call.parameters
                 )
-                call.respond(ServerResponse(0,"Request sent"))
+                call.respond(ServerResponse(0, "Request sent"))
             }
             post("/withdraw") {
 
