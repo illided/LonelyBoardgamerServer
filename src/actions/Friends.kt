@@ -5,6 +5,7 @@ import com.twoilya.lonelyboardgamer.Ticket
 import com.twoilya.lonelyboardgamer.actions.commands.friends.*
 import io.ktor.application.*
 import io.ktor.auth.*
+import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
@@ -20,6 +21,10 @@ fun Route.friendsActions() {
                     )
                 )
             )
+        }
+
+        post("/delete") {
+
         }
 
         route("/requests") {
@@ -64,7 +69,7 @@ fun Route.friendsActions() {
                     ServerResponse(
                         0, AnswerRequest.run(
                             call.principal<Ticket>()?.id,
-                            call.parameters
+                            call.receiveParameters()
                         )
                     )
                 )
@@ -73,12 +78,17 @@ fun Route.friendsActions() {
             post("/send") {
                 SendRequest.run(
                     call.principal<Ticket>()?.id,
-                    call.parameters
+                    call.receiveParameters()
                 )
                 call.respond(ServerResponse(0, "Request sent"))
             }
-            post("/withdraw") {
 
+            post("/revoke") {
+                RevokeRequest.run(
+                    call.principal<Ticket>()?.id,
+                    call.receiveParameters()
+                )
+                call.respond(ServerResponse(0, "Request revoked"))
             }
         }
     }
