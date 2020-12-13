@@ -34,18 +34,6 @@ data class PersonalProfileInfo(
     val description: String
 )
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-data class RelativeProfileInfo(
-    val id: Long,
-    val VKid: String? = null,
-    val firstName: String,
-    val secondName: String,
-    val prefCategories: List<String>,
-    val prefMechanics: List<String>,
-    val description: String,
-    /*val friendStatus: FriendStatus*/
-)
-
 data class ShortProfileInfo(
     val id: Long,
     val firstName: String,
