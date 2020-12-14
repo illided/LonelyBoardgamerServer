@@ -17,6 +17,6 @@ object GetFriendList : TableCommand<List<ShortProfileInfo>>() {
         return getRelationListQuery(userId) {
             ((UsersRelations.first eq userId) or (UsersRelations.second eq userId)) and
                     (UsersRelations.status eq FriendStatus.Friends)
-        }.batch(parameters["limit"]?.toInt(), parameters["offset"]?.toInt())
+        }.batch(limit = parameters["limit"]?.toInt(), offset = parameters["offset"]?.toInt())
     }
 }

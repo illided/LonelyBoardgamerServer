@@ -12,7 +12,7 @@ object UsersProfileInfo : Table() {
     const val DESCRIPTION_MAX_LENGTH = 250
 
     val id: Column<Long> = long("id").autoIncrement().index()
-    val VKid: Column<String> = varchar("VKid", 20)
+    val VKid: Column<String> = varchar("VKid", 20).uniqueIndex()
     val firstName: Column<String> = varchar("firstName", FIRST_NAME_MAX_LENGTH)
     val secondName: Column<String> = varchar("secondName", SECOND_NAME_MAX_LENGTH)
     val description: Column<String?> = varchar("description", DESCRIPTION_MAX_LENGTH).nullable()

@@ -18,6 +18,6 @@ object GetToMeRequests: TableCommand<List<ShortProfileInfo>>() {
             ((UsersRelations.first eq userId) or (UsersRelations.second eq userId)) and
                     (UsersRelations.status eq FriendStatus.Pending) and
                     (UsersRelations.actionUser neq userId)
-        }.batch(parameters["limit"]?.toInt(), parameters["offset"]?.toInt())
+        }.batch(limit = parameters["limit"]?.toInt(), offset = parameters["offset"]?.toInt())
     }
 }
