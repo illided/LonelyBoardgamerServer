@@ -41,7 +41,11 @@ object AnswerRequest : TableCommand<String>() {
 
         val (person1, person2) = min(userId, target) to max(userId, target)
 
-        val isAffected = UsersRelations.update({ (UsersRelations.first eq person1) and (UsersRelations.second eq person2) }) {
+        val isAffected = UsersRelations.update({
+            (UsersRelations.first eq person1) and
+                    (UsersRelations.second eq person2) and
+                    (UsersRelations.actionUser eq target)
+        }) {
             it[status] = newStatus
             it[actionUser] = target
         } == 1
