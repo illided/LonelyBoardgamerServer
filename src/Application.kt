@@ -3,6 +3,7 @@ package com.twoilya.lonelyboardgamer
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.twoilya.lonelyboardgamer.actions.profileActions
 import com.twoilya.lonelyboardgamer.actions.searchActions
+import com.twoilya.lonelyboardgamer.actions.friendsActions
 import com.twoilya.lonelyboardgamer.auth.JwtConfig
 import com.twoilya.lonelyboardgamer.actions.loginRoute
 import com.twoilya.lonelyboardgamer.actions.registerRoute
@@ -72,6 +73,7 @@ fun Application.module(testing: Boolean = false) {
             authenticate {
                 profileActions()
                 searchActions()
+                friendsActions()
             }
         }
     }.start(wait = true)

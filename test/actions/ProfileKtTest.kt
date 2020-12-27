@@ -185,7 +185,7 @@ internal class ProfileKtTest {
         @JvmStatic
         @BeforeAll
         fun bootstrap() {
-            Database.connect(dataSource)
+            DatabaseConnector.init(dataSource)
 
             val testList = listOf(
                 "1" to "Test 1",
@@ -195,13 +195,6 @@ internal class ProfileKtTest {
             )
 
             transaction {
-                create(
-                    UsersLoginInfo,
-                    UsersProfileInfo,
-                    BGCategories,
-                    BGMechanics,
-                    UsersLocations
-                )
                 UsersProfileInfo.insert {
                     it[firstName] = "John"
                     it[secondName] = "Wick"

@@ -132,7 +132,7 @@ internal class SearchKtTest {
         @JvmStatic
         @BeforeAll
         fun bootstrap() {
-            Database.connect(dataSource)
+            DatabaseConnector.init(dataSource)
 
             val mockedCatsAndMecs = listOf(
                 "1" to "Test 1",
@@ -160,14 +160,6 @@ internal class SearchKtTest {
 
 
             transaction {
-                SchemaUtils.create(
-                    UsersLoginInfo,
-                    UsersProfileInfo,
-                    BGCategories,
-                    BGMechanics,
-                    UsersLocations
-                )
-
                 UsersProfileInfo.batchInsert(
                     userInfoEntries
                 ) { entry ->
