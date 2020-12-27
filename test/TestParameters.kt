@@ -1,6 +1,10 @@
 import io.ktor.http.Parameters
 
-class TestParameters(override val caseInsensitiveName: Boolean = false) : Parameters {
+class TestParameters(
+    vararg initialParameters: Pair<String, String>
+) : Parameters {
+    override val caseInsensitiveName: Boolean = false
+
     private val params: MutableSet<Map.Entry<String, List<String>>> = mutableSetOf()
 
     override fun entries(): Set<Map.Entry<String, List<String>>> = params
@@ -21,6 +25,12 @@ class TestParameters(override val caseInsensitiveName: Boolean = false) : Parame
             throw IllegalArgumentException("Too many params for custom params class")
 
         return listOfParams.component1()
+    }
+
+    init {
+        for (parameter in initialParameters) {
+            this[parameter.first] = parameter.second
+        }
     }
 
     class Param(
